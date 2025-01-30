@@ -1,6 +1,5 @@
 //region Imports
 package pedroPathing.tuners_tests;
-
 import android.view.View;
 
 import com.pedropathing.follower.Follower;
