@@ -5,17 +5,17 @@ import com.pedropathing.localization.constants.*;
 
 public class LConstants {
     static {
-        ThreeWheelConstants.forwardTicksToInches = .001989436789;
-        ThreeWheelConstants.strafeTicksToInches = .001989436789;
-        ThreeWheelConstants.turnTicksToInches = .001989436789;
-        ThreeWheelConstants.leftY = 1;
-        ThreeWheelConstants.rightY = -1;
-        ThreeWheelConstants.strafeX = -2.5;
-        ThreeWheelConstants.leftEncoder_HardwareMapName = "leftFront";
-        ThreeWheelConstants.rightEncoder_HardwareMapName = "rightRear";
-        ThreeWheelConstants.strafeEncoder_HardwareMapName = "rightFront";
+        ThreeWheelConstants.forwardTicksToInches = 0.002;
+        ThreeWheelConstants.strafeTicksToInches = 0.0013;
+        ThreeWheelConstants.turnTicksToInches = 0.0029;
+        ThreeWheelConstants.leftY = 3.720472;
+        ThreeWheelConstants.rightY = -3.720472;
+        ThreeWheelConstants.strafeX = -7.1299213;
+        ThreeWheelConstants.leftEncoder_HardwareMapName = "rightFront";
+        ThreeWheelConstants.rightEncoder_HardwareMapName = "leftBack";
+        ThreeWheelConstants.strafeEncoder_HardwareMapName = "rightBack";
         ThreeWheelConstants.leftEncoderDirection = Encoder.REVERSE;
-        ThreeWheelConstants.rightEncoderDirection = Encoder.REVERSE;
+        ThreeWheelConstants.rightEncoderDirection = Encoder.FORWARD;
         ThreeWheelConstants.strafeEncoderDirection = Encoder.FORWARD;
     }
 }
