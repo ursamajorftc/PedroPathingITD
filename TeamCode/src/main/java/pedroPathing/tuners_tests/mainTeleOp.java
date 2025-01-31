@@ -13,9 +13,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
 import com.acmerobotics.dashboard.FtcDashboard;
-
-import pedroPathing.constants.FConstants;
-import pedroPathing.constants.LConstants;
+import pedroPathing.constants.*;
 //endregion
 
 @TeleOp(name = "mainTeleOp", group = "Linear OpMode")
@@ -27,6 +25,7 @@ public class mainTeleOp extends OpMode {
 	private CRServo intakeCRSLeft = null;
 	private CRServo intakeCRSRight = null;
 	private Servo intakeServoLeft = null;
+	private Servo intakeServoRight = null;
 	private Servo lockServo = null;
 	private DcMotor intakeDrive = null;
 	private Servo clawServo = null;
@@ -39,37 +38,6 @@ public class mainTeleOp extends OpMode {
 	NormalizedColorSensor colorSensor;
 	NormalizedColorSensor sampleDistance;
 	View relativeLayout;
-	//endregion
-	//region Constants
-	//wrist positions
-	private static final double WRISTPOSITIONDOWN = 0;
-	private static final double WRISTPOSITIONSTRAIGHT = 0.62;
-	private static final double WRISTPOSITIONOUT = 1;
-
-	//arm positions
-	private static final double ARMPOSITIONDEPOSIT = 0.425;
-	private static final double ARMPOSITIONHOVER = 0.815;
-	private static final double ARMPOSITIONGRAB = 0.95;
-	private static final int HIGHBASKET = 1100;
-	private static final int LOWBASKET = 530;
-	private static final int DOWNPOSITION = 0;
-
-	//claw positions
-	private static final double CLAWPOSITIONOPEN = 0.26;
-	private static final double CLAWPOSITIONCLOSED = 0.48;
-
-	//miscellaneous
-	private boolean previousDpadDownState = false;
-	private boolean previousDpadUpState = false;
-	private boolean PreviousDpadLeftState = false;
-	private boolean previousAState = false;
-	private boolean previousIntakeState = false;
-	private Servo intakeServoRight = null;
-	private boolean sampleDistanceTriggered = false;
-	private int state = 0; // Persistent state variable
-	private long startTime = 0; // Persistent timer variable
-	private static final float[] hsvValues = new float[3];
-	private static final double INTAKESERVOPOSITION = 0;
 	//endregion
 
 	/** This method is called once when init is played, it initializes the follower **/
