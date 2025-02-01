@@ -470,7 +470,7 @@ public class Auto04 extends OpMode {
 
 			case MOVE_ARM:
 				if (currentTime - stateStartTime >= 200) { // Wait 200ms
-					wristDown();
+					wristBack();
 					stateStartTime = currentTime;
 					depositState = DepositState.MOVE_WRIST;
 				}
@@ -495,7 +495,7 @@ public class Auto04 extends OpMode {
 				break;
 
 			case COMPLETE:
-				if (currentTime - stateStartTime > 200) {
+				if (currentTime - stateStartTime > 200) { // Wait 200ms
 					depositState = DepositState.IDLE;
 				}
 				// All actions complete; stay idle or transition as needed
