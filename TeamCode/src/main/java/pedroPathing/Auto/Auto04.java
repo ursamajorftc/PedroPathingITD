@@ -244,7 +244,7 @@ public class Auto04 extends OpMode {
 				/* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the scorePose's position */
 				if (!follower.isBusy()) {
 					/* Score Sample */
-
+					scoreSample();
 					/* Since this is a pathChain, we can have Pedro hold the end point while we are grabbing the sample */
 					follower.followPath(grabPickup2, true);
 					setPathState(4);
@@ -254,7 +254,7 @@ public class Auto04 extends OpMode {
 				/* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the pickup2Pose's position */
 				if (!follower.isBusy()) {
 					/* Grab Sample */
-
+					grabSample(350);
 					/* Since this is a pathChain, we can have Pedro hold the end point while we are scoring the sample */
 					follower.followPath(scorePickup2, true);
 					setPathState(5);
@@ -264,7 +264,7 @@ public class Auto04 extends OpMode {
 				/* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the scorePose's position */
 				if (!follower.isBusy()) {
 					/* Score Sample */
-
+					scoreSample();
 					/* Since this is a pathChain, we can have Pedro hold the end point while we are grabbing the sample */
 					follower.followPath(grabPickup3, true);
 					setPathState(6);
@@ -274,7 +274,7 @@ public class Auto04 extends OpMode {
 				/* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the pickup3Pose's position */
 				if (!follower.isBusy()) {
 					/* Grab Sample */
-
+					grabSample(425);
 					/* Since this is a pathChain, we can have Pedro hold the end point while we are scoring the sample */
 					follower.followPath(scorePickup3, true);
 					setPathState(7);
@@ -284,7 +284,7 @@ public class Auto04 extends OpMode {
 				/* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the scorePose's position */
 				if (!follower.isBusy()) {
 					/* Score Sample */
-
+					scoreSample();
 					/* Since this is a pathChain, we can have Pedro hold the end point while we are parked */
 					follower.followPath(park, true);
 					setPathState(8);
