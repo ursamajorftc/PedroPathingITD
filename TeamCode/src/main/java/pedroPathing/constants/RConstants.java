@@ -9,7 +9,7 @@ public class RConstants {
 	public static final double WRISTPOSITIONOUT = 1;
 
 	//arm positions
-	public static final double ARMPOSITIONDEPOSIT = 0.425;
+	public static final double ARMPOSITIONDEPOSIT = 0.475;
 	public static final double ARMPOSITIONHOVER = 0.815;
 	public static final double ARMPOSITIONGRAB = 0.95;
 	public static final int HIGHBASKET = 1100;
@@ -30,5 +30,10 @@ public class RConstants {
 	public int state = 0; // Persistent state variable
 	public long startTime = 0; // Persistent timer variable
 	public static final float[] hsvValues = new float[3];
+	//intake
 	public static final double INTAKESERVOPOSITION = 0;
+	public static final double RIGHTINTAKEUP = 0.695;
+	public static final double LEFTINTAKEUP = 0.32;
+	public static final double RIGHTINTAKEDOWN = 0.45;
+	public static final double LEFTINTAKEDOWN = 0.54;
 }

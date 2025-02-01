@@ -14,7 +14,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
 import com.acmerobotics.dashboard.FtcDashboard;
 import pedroPathing.constants.*;
-import pedroPathing.tuners_tests.pid.PIDController;
+import pedroPathing.pid.PIDController;
 //endregion
 
 @TeleOp(name = "mainTeleOp", group = "Linear OpMode")
