@@ -1,4 +1,4 @@
-package pedroPathing.tuners_tests;
+package pedroPathing.tuners_tests.pid;
 
 public class PIDController {
 
