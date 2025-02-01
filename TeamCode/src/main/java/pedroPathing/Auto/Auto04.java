@@ -1,5 +1,6 @@
 package pedroPathing.Auto;
 
+import com.acmerobotics.dashboard.FtcDashboard;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.localization.Pose;
 import com.pedropathing.pathgen.BezierCurve;
@@ -11,9 +12,12 @@ import com.pedropathing.util.Constants;
 import com.pedropathing.util.Timer;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import  com.qualcomm.robotcore.eventloop.opmode.OpMode;
-
-import pedroPathing.constants.FConstants;
-import pedroPathing.constants.LConstants;
+import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.ElapsedTime;
+import pedroPathing.Actions.*;
+import pedroPathing.constants.*;
 
 /**
  * This is an example auto that showcases movement and control of two servos autonomously.
@@ -27,9 +31,24 @@ import pedroPathing.constants.LConstants;
 
 @Autonomous(name = "Auto04", group = "Examples")
 public class Auto04 extends OpMode {
-
+    private FtcDashboard dashboard;
+    private ElapsedTime runtime = new ElapsedTime();
+    private CRServo intakeCRSLeft = null;
+    private CRServo intakeCRSRight = null;
+    private Servo intakeServoLeft = null;
+    private Servo intakeServoRight = null;
+    private Servo lockServo = null;
+    private DcMotor intakeDrive = null;
+    private Servo clawServo = null;
+    private Servo wristServo = null;
+    private Servo armServo = null;
+    private DcMotor outmoto1 = null;
+    private DcMotor outmoto2 = null;
+    private Intake intake = new Intake();
+    ElapsedTime timer = new ElapsedTime();
     private Follower follower;
     private Timer pathTimer, actionTimer, opmodeTimer;
+
 
     /** This is the variable where we store the state of our auto.
      * It is used by the pathUpdate method. */
@@ -167,6 +186,14 @@ public class Auto04 extends OpMode {
                 /* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the pickup1Pose's position */
                 if(!follower.isBusy()) {
                     /* Grab Sample */
+                    intake.init();
+                    intake.setIntakePos(350);
+                    timer.reset();
+                    if (intake.getIntakePos()>=325) intake.intakeDown();
+                    timer.reset();
+                    if (timer.seconds() < 1.5) intake.intakeUp();
+                    timer.reset();
+                    if (timer.seconds() < 0.2) intake.setIntakePos(0);
 
                     /* Since this is a pathChain, we can have Pedro hold the end point while we are scoring the sample */
                     follower.followPath(scorePickup1,true);
@@ -269,6 +296,10 @@ public class Auto04 extends OpMode {
         follower = new Follower(hardwareMap);
         follower.setStartingPose(startPose);
         buildPaths();
+
+        intakeDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        intakeDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        intakeDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
     /** This method is called continuously after Init while waiting for "play". **/
