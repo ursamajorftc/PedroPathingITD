@@ -46,6 +46,15 @@ public class RConstants {
 		COMPLETE
 	}
 
+	public enum IntakeState {
+		INTAKE0,
+		INTAKE300,
+		INTAKEDOWN,
+		INTAKE880,
+		INTAKESTOP,
+		INTAKE350
+	}
+
 }
 
 

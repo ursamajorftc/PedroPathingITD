@@ -60,9 +60,16 @@ public class iHopeThisWorksLol extends OpMode {
 	private boolean scored = false;
 	private boolean safe = false;
 	private DepositState depositState = DepositState.IDLE;
-	private IntakeState intakeState = IntakeState.INTAKESTART;
 	private long stateStartTime = 0;
 	private boolean downState = false;
+	private boolean firstTime = true;
+	private boolean previousIntakeState = false;
+	private boolean intakeComplete = false;
+	long intakeStartTime = 0;
+	private boolean pickedUp = false;
+
+
+
 	//endregion
 	//region Paths
 	/**
@@ -136,6 +143,12 @@ public class iHopeThisWorksLol extends OpMode {
 		lockServo = hardwareMap.get(Servo.class, "lockServo");
 		intakeDrive = hardwareMap.get(DcMotor.class, "intakeDrive");
 
+		intakeDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+		intakeDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+		intakeDrive.setTargetPosition(0);
+		intakeDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+		intakeDrive.setPower(0.5);
+
 		// Deposit
 		clawServo = hardwareMap.get(Servo.class, "clawServo");
 		wristServo = hardwareMap.get(Servo.class, "wristServo");
@@ -146,6 +159,9 @@ public class iHopeThisWorksLol extends OpMode {
 		armServo.setPosition(RConstants.ARMPOSITIONDEPOSIT);
 		wristServo.setPosition(RConstants.WRISTPOSITIONSTRAIGHT);
 		clawServo.setPosition(RConstants.CLAWPOSITIONCLOSED);
+
+		intakeServoLeft.setPosition(0.32);
+		intakeServoRight.setPosition(0.695);
 
 		pathTimer = new Timer();
 		opmodeTimer = new Timer();
@@ -262,10 +278,12 @@ public class iHopeThisWorksLol extends OpMode {
 					clawServo.setPosition(RConstants.CLAWPOSITIONOPEN);
 					downState = true;
 					scored = true;
+					if (firstTime) {
+						stateStartTime = System.currentTimeMillis();
+						firstTime = false;
+					}
 				}
-
-
-
+				updateArmRetracty();
 
 
                 /* You could check for
@@ -280,21 +298,33 @@ public class iHopeThisWorksLol extends OpMode {
 //					scoreSample();
 					/* Since this is a pathChain, we can have Pedro hold the end point while we are grabbing the sample */
 					follower.followPath(grabPickup1, true);
+					safe = false;
 
 
-//					setPathState(2);
+					setPathState(2);
 				}
 				break;
 			case 2:
-				/* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the pickup1Pose's position */
-				if (!follower.isBusy()) {
 
-					/* Grab Sample */
-				//	grabSample(350);
+
+				/* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the pickup1Pose's position */
+				if (!follower.isBusy() && !pickedUp) {
+
+					intakeState = RConstants.IntakeState.INTAKE0;
+					pickedUp = true;
+
 					/* Since this is a pathChain, we can have Pedro hold the end point while we are scoring the sample */
-					follower.followPath(scorePickup1, true);
-					setPathState(3);
+
 				}
+				intakeMovement(620);
+
+
+//				follower.followPath(scorePickup1, true);
+//				setPathState(3);
+
+
+
+
 				break;
 			case 3:
 				/* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the scorePose's position */
@@ -374,7 +404,7 @@ public class iHopeThisWorksLol extends OpMode {
 		// These loop the movements of the robot
 		follower.update();
 		autonomousPathUpdate();
-		updateArmRetracty();
+
 
 		// Feedback to Driver Hub
 		telemetry.addData("path state", pathState);
@@ -382,6 +412,10 @@ public class iHopeThisWorksLol extends OpMode {
 		telemetry.addData("y", follower.getPose().getY());
 		telemetry.addData("heading", follower.getPose().getHeading());
 		telemetry.addData("outmoto1 position", outmoto1.getCurrentPosition());
+		telemetry.addData("intakeDrive position", intakeDrive.getCurrentPosition());
+		telemetry.addData("intakeState", intakeState);
+
+		telemetry.addData("downState", downState);
 		telemetry.update();
 
 		power = backPid.getPower(outmoto1.getCurrentPosition());
@@ -407,11 +441,8 @@ public class iHopeThisWorksLol extends OpMode {
 
 		switch (currentState) {
 			case IDLE:
-				if (downState) {
-					stateStartTime = currentTime; // Record the time
 
-				}
-				if ((currentTime - stateStartTime >= 200) && downState) {
+				if ( downState && (currentTime - stateStartTime > 200)) {
 					// Transition to CLOSE_CLAW state
 					clawServo.setPosition(RConstants.CLAWPOSITIONCLOSED);
 					stateStartTime = currentTime; // Record the time
@@ -456,10 +487,76 @@ public class iHopeThisWorksLol extends OpMode {
 				if (currentTime - stateStartTime > 200) {
 					currentState = RConstants.RobotState.IDLE;
 					intakeDrive.setTargetPosition(0);
+					safe = true;
 					downState = false;
 				}
 				// All actions complete; stay idle or transition as needed
 				break;
+		}
+	}
+
+	private RConstants.IntakeState intakeState = RConstants.IntakeState.INTAKESTOP;
+
+
+	public void intakeMovement(int intakeTargetPosition) {
+		if ((intakeDrive.getCurrentPosition() > 145) && outmoto1.getCurrentPosition() < 100) {
+			previousIntakeState = true;
+			if (outmoto1.getCurrentPosition() < 15) {
+				armServo.setPosition(RConstants.ARMPOSITIONHOVER);
+				clawServo.setPosition(RConstants.CLAWPOSITIONOPEN);
+			}
+		}
+
+
+		switch (intakeState) {
+
+			case INTAKE0:
+
+				intakeDrive.setTargetPosition(300);
+				intakeState = RConstants.IntakeState.INTAKE300;
+				intakeDrive.setPower(1);
+
+				break;
+
+			case INTAKE300:
+				if (intakeDrive.getCurrentPosition() > 250) {
+					telemetry.addData("yippee", intakeState);
+					telemetry.update();
+
+					intakeServoLeft.setPosition(0.54);
+					intakeServoRight.setPosition(0.45);
+					intakeCRSLeft.setPower(-1);
+					intakeCRSRight.setPower(1);
+					lockServo.setPosition(0);
+					intakeState = RConstants.IntakeState.INTAKEDOWN;
+					intakeDrive.setPower(0.2);
+				}
+				break;
+
+			case INTAKEDOWN:
+				intakeDrive.setTargetPosition(intakeTargetPosition);
+				intakeState = RConstants.IntakeState.INTAKE880;
+
+				break;
+
+			case INTAKE880:
+				if (intakeDrive.getCurrentPosition() > (intakeTargetPosition - 10)) {
+					intakeDrive.setTargetPosition(0);
+					intakeDrive.setPower(1);
+					intakeServoLeft.setPosition(0.32);
+					intakeServoRight.setPosition(0.695);
+					intakeCRSLeft.setPower(-0.1);
+					intakeCRSRight.setPower(0.1);
+					intakeState = RConstants.IntakeState.INTAKESTOP;
+					intakeComplete = true;
+
+					intakeStartTime = System.currentTimeMillis();
+
+				}
+
+				break;
+
+
 		}
 	}
 
