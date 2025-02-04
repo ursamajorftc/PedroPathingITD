@@ -18,31 +18,37 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import pedroPathing.pid.*;
-import pedroPathing.constants.*;
+import pedroPathing.constants.FConstants;
+import pedroPathing.constants.LConstants;
+import pedroPathing.constants.RConstants;
+import pedroPathing.pid.PIDController;
 
 
 // This is a 0+4 (Specimen + Sample) bucket auto. It scores a neutral preload and then pickups 3 samples from the ground and scores them before parking in the submersible zone.
 
-@Autonomous(name = "Auto04", group = "Examples")
-public class Auto04 extends OpMode {
+@Autonomous(name = "i hope this works", group = "Examples")
+public class iHopeThisWorksLol extends OpMode {
+
+
+
 	//region Initializations
 	private FtcDashboard dashboard;
 
 	// Intake
-	private CRServo intakeCRSLeft = hardwareMap.get(CRServo.class, "intakeCRSLeft");
-	private CRServo intakeCRSRight = hardwareMap.get(CRServo.class, "intakeCRSRight");
-	private Servo intakeServoLeft = hardwareMap.get(Servo.class, "intakeServoLeft");
-	private Servo intakeServoRight = hardwareMap.get(Servo.class, "intakeServoRight");
-	private Servo lockServo = hardwareMap.get(Servo.class, "lockServo");
-	private DcMotor intakeDrive = hardwareMap.get(DcMotor.class, "intakeDrive");
+	private CRServo intakeCRSLeft = null;
+	private CRServo intakeCRSRight = null;
+	private Servo intakeServoLeft = null;
+	private Servo intakeServoRight = null;
+	private Servo lockServo = null;
+	private DcMotor intakeDrive = null;
 
 	// Deposit
-	private Servo clawServo = hardwareMap.get(Servo.class, "clawServo");
-	private Servo wristServo = hardwareMap.get(Servo.class, "wristServo");
-	private Servo armServo = hardwareMap.get(Servo.class, "armServo");
-	private DcMotor outmoto1 = hardwareMap.get(DcMotorEx.class, "outmoto1");
-	private DcMotor outmoto2 = hardwareMap.get(DcMotorEx.class, "outmoto2");
+	private Servo clawServo = null;
+	private Servo wristServo = null;
+	private Servo armServo = null;
+
+	private DcMotor outmoto1 = null;
+	private DcMotor outmoto2 = null;
 
 	// Utility
 	ElapsedTime timer = new ElapsedTime();
@@ -51,9 +57,12 @@ public class Auto04 extends OpMode {
 	private PIDController backPid = new PIDController(0.04, 0, 0.005);
 	private boolean previousAState = false;
 	private double power;
+	private boolean scored = false;
+	private boolean safe = false;
 	private DepositState depositState = DepositState.IDLE;
 	private IntakeState intakeState = IntakeState.INTAKESTART;
 	private long stateStartTime = 0;
+	private boolean downState = false;
 	//endregion
 	//region Paths
 	/**
@@ -118,6 +127,8 @@ public class Auto04 extends OpMode {
 	// This method is called once at the init of the OpMode.
 	@Override
 	public void init() {
+
+
 		intakeCRSLeft = hardwareMap.get(CRServo.class, "intakeCRSLeft");
 		intakeCRSRight = hardwareMap.get(CRServo.class, "intakeCRSRight");
 		intakeServoLeft = hardwareMap.get(Servo.class, "intakeServoLeft");
@@ -132,6 +143,10 @@ public class Auto04 extends OpMode {
 		outmoto1 = hardwareMap.get(DcMotorEx.class, "outmoto1");
 		outmoto2 = hardwareMap.get(DcMotorEx.class, "outmoto2");
 
+		armServo.setPosition(RConstants.ARMPOSITIONDEPOSIT);
+		wristServo.setPosition(RConstants.WRISTPOSITIONSTRAIGHT);
+		clawServo.setPosition(RConstants.CLAWPOSITIONCLOSED);
+
 		pathTimer = new Timer();
 		opmodeTimer = new Timer();
 		opmodeTimer.resetTimer();
@@ -139,17 +154,20 @@ public class Auto04 extends OpMode {
 		Constants.setConstants(FConstants.class, LConstants.class);
 		follower = new Follower(hardwareMap);
 		follower.setStartingPose(startPose);
+
+
+
 		buildPaths();
 
-		intakeDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-		intakeDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-		intakeDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
-		outmoto1.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
-		outmoto2.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
-
-		outmoto1.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
-		outmoto2.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
+//		intakeDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+//		intakeDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//		intakeDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//
+//		outmoto1.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+//		outmoto2.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+//
+//		outmoto1.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
+//		outmoto2.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
 	}
 	public void buildPaths() {
 
@@ -224,31 +242,55 @@ public class Auto04 extends OpMode {
 	public void autonomousPathUpdate() {
 		switch (pathState) {
 			case 0:
-				follower.followPath(scorePreload);
-				setPathState(1);
+
+				follower.followPath(scorePreload,true);
+				backPid.setTargetPosition(1150);
+
+
+					setPathState(1);
+
+
+
+
+//				backPid.setTargetPosition(1150);
+
 				break;
 			case 1:
+				if (!scored && (outmoto1.getCurrentPosition() > 1150)){
+					armServo.setPosition(RConstants.ARMPOSITIONDEPOSIT);
+					wristServo.setPosition(RConstants.WRISTPOSITIONOUT);
+					clawServo.setPosition(RConstants.CLAWPOSITIONOPEN);
+					downState = true;
+					scored = true;
+				}
+
+
+
+
 
                 /* You could check for
                 - Follower State: "if(!follower.isBusy() {}"
-                - Time: "if(pathTimer.getElapsedTimeSeconds() > 1) {}"
+                - Time: "if(pathTimer.getElapsedTimeSeconds() > 1) {}"`
                 - Robot Position: "if(follower.getPose().getX() > 36) {}"
                 */
 
 				/* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the scorePose's position */
-				if (!follower.isBusy()) {
+				if (!follower.isBusy() && safe) {
 					/* Score Preload */
-					scoreSample();
+//					scoreSample();
 					/* Since this is a pathChain, we can have Pedro hold the end point while we are grabbing the sample */
 					follower.followPath(grabPickup1, true);
-					setPathState(2);
+
+
+//					setPathState(2);
 				}
 				break;
 			case 2:
 				/* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the pickup1Pose's position */
 				if (!follower.isBusy()) {
+
 					/* Grab Sample */
-					grabSample(350);
+				//	grabSample(350);
 					/* Since this is a pathChain, we can have Pedro hold the end point while we are scoring the sample */
 					follower.followPath(scorePickup1, true);
 					setPathState(3);
@@ -258,7 +300,7 @@ public class Auto04 extends OpMode {
 				/* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the scorePose's position */
 				if (!follower.isBusy()) {
 					/* Score Sample */
-					scoreSample();
+				//	scoreSample();
 					/* Since this is a pathChain, we can have Pedro hold the end point while we are grabbing the sample */
 					follower.followPath(grabPickup2, true);
 					setPathState(4);
@@ -268,7 +310,7 @@ public class Auto04 extends OpMode {
 				/* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the pickup2Pose's position */
 				if (!follower.isBusy()) {
 					/* Grab Sample */
-					grabSample(350);
+					//grabSample(350);
 					/* Since this is a pathChain, we can have Pedro hold the end point while we are scoring the sample */
 					follower.followPath(scorePickup2, true);
 					setPathState(5);
@@ -278,7 +320,7 @@ public class Auto04 extends OpMode {
 				/* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the scorePose's position */
 				if (!follower.isBusy()) {
 					/* Score Sample */
-					scoreSample();
+				//	scoreSample();
 					/* Since this is a pathChain, we can have Pedro hold the end point while we are grabbing the sample */
 					follower.followPath(grabPickup3, true);
 					setPathState(6);
@@ -288,7 +330,7 @@ public class Auto04 extends OpMode {
 				/* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the pickup3Pose's position */
 				if (!follower.isBusy()) {
 					/* Grab Sample */
-					grabSample(425);
+					//grabSample(425);
 					/* Since this is a pathChain, we can have Pedro hold the end point while we are scoring the sample */
 					follower.followPath(scorePickup3, true);
 					setPathState(7);
@@ -298,7 +340,7 @@ public class Auto04 extends OpMode {
 				/* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the scorePose's position */
 				if (!follower.isBusy()) {
 					/* Score Sample */
-					scoreSample();
+					//scoreSample();
 					/* Since this is a pathChain, we can have Pedro hold the end point while we are parked */
 					follower.followPath(park, true);
 					setPathState(8);
@@ -329,19 +371,17 @@ public class Auto04 extends OpMode {
 	@Override
 	public void loop() {
 
-
-
-
-
 		// These loop the movements of the robot
 		follower.update();
 		autonomousPathUpdate();
+		updateArmRetracty();
 
 		// Feedback to Driver Hub
 		telemetry.addData("path state", pathState);
 		telemetry.addData("x", follower.getPose().getX());
 		telemetry.addData("y", follower.getPose().getY());
 		telemetry.addData("heading", follower.getPose().getHeading());
+		telemetry.addData("outmoto1 position", outmoto1.getCurrentPosition());
 		telemetry.update();
 
 		power = backPid.getPower(outmoto1.getCurrentPosition());
@@ -353,112 +393,182 @@ public class Auto04 extends OpMode {
 			outmoto2.setPower(-power);
 		}
 
-		intakeCRSLeft.setPower(-1);
-		intakeCRSRight.setPower(1);
 	}
+
+	private RConstants.RobotState currentState = RConstants.RobotState.IDLE;
+
+
+
+	public void updateArmRetracty() {
+
+		// Get the current time in milliseconds
+		long currentTime = System.currentTimeMillis();
+
+
+		switch (currentState) {
+			case IDLE:
+				if (downState) {
+					stateStartTime = currentTime; // Record the time
+
+				}
+				if ((currentTime - stateStartTime >= 200) && downState) {
+					// Transition to CLOSE_CLAW state
+					clawServo.setPosition(RConstants.CLAWPOSITIONCLOSED);
+					stateStartTime = currentTime; // Record the time
+					currentState = RConstants.RobotState.CLOSE_CLAW;
+				}
+				break;
+
+			case CLOSE_CLAW:
+				if (currentTime - stateStartTime >= 200) { // Wait 200ms
+					armServo.setPosition(0.475);
+					stateStartTime = currentTime;
+					currentState = RConstants.RobotState.MOVE_ARM;
+				}
+				break;
+
+			case MOVE_ARM:
+				if (currentTime - stateStartTime >= 200) { // Wait 200ms
+					wristServo.setPosition(RConstants.WRISTPOSITIONDOWN);
+					stateStartTime = currentTime;
+					currentState = RConstants.RobotState.MOVE_WRIST;
+				}
+				break;
+
+			case MOVE_WRIST:
+				if (currentTime - stateStartTime >= 200) { // Wait 200ms
+					clawServo.setPosition(RConstants.CLAWPOSITIONOPEN);
+					stateStartTime = currentTime;
+					currentState = RConstants.RobotState.OPEN_CLAW;
+				}
+				break;
+
+			case OPEN_CLAW:
+				if (currentTime - stateStartTime >= 100) { // Wait 200ms
+					backPid.setTargetPosition(0);
+					telemetry.addData("yippee", gamepad1.a);
+					stateStartTime = currentTime;
+					currentState = RConstants.RobotState.COMPLETE;
+				}
+				break;
+
+			case COMPLETE:
+				if (currentTime - stateStartTime > 200) {
+					currentState = RConstants.RobotState.IDLE;
+					intakeDrive.setTargetPosition(0);
+					downState = false;
+				}
+				// All actions complete; stay idle or transition as needed
+				break;
+		}
+	}
+
+
 
 	//region Intake Methods
-	public void setIntakePos(int distance) {
-		intakeDrive.setTargetPosition(distance);
-		intakeDrive.setPower(1);
-	}
-
-	public double getIntakePos() {
-		return intakeDrive.getCurrentPosition();
-	}
-
-	public void intakeDown() {
-		intakeServoLeft.setPosition(RConstants.LEFTINTAKEDOWN);
-		intakeServoRight.setPosition(RConstants.RIGHTINTAKEDOWN);
-	}
-
-	public void intakeUp() {
-		intakeServoLeft.setPosition(RConstants.LEFTINTAKEUP);
-		intakeServoRight.setPosition(RConstants.RIGHTINTAKEUP);
-	}
-	public void spinIntake(){
-		intakeCRSLeft.setPower(-1);
-		intakeCRSRight.setPower(1);
-	}
-	public void spinIntake(double power){
-		intakeCRSLeft.setPower(-power);
-		intakeCRSRight.setPower(power);
-	}
-
-	public void openLock() {
-		lockServo.setPosition(0);
-	}
-
-	public void closeLock() {
-		lockServo.setPosition(0.3);
-	}
+//	public void setIntakePos(int distance) {
+//		intakeDrive.setTargetPosition(distance);
+//		intakeDrive.setPower(1);
+//	}
+//
+//	public double getIntakePos() {
+//		return intakeDrive.getCurrentPosition();
+//	}
+//
+//	public void intakeDown() {
+//		intakeServoLeft.setPosition(RConstants.LEFTINTAKEDOWN);
+//		intakeServoRight.setPosition(RConstants.RIGHTINTAKEDOWN);
+//	}
+//
+//	public void intakeUp() {
+//		intakeServoLeft.setPosition(RConstants.LEFTINTAKEUP);
+//		intakeServoRight.setPosition(RConstants.RIGHTINTAKEUP);
+//	}
+//	public void spinIntake(){
+//		intakeCRSLeft.setPower(-1);
+//		intakeCRSRight.setPower(1);
+//	}
+//	public void spinIntake(double power){
+//		intakeCRSLeft.setPower(-power);
+//		intakeCRSRight.setPower(power);
+//	}
+//
+//	public void openLock() {
+//		lockServo.setPosition(0);
+//	}
+//
+//	public void closeLock() {
+//		lockServo.setPosition(0.3);
+//	}
 	public enum IntakeState {
 		INTAKESTART,
 		INTAKEOUT,
 		INTAKEDOWN,
 		INTAKEUP
 	}
-	public void grabSample(int distance) {
-		switch (intakeState){
-			case INTAKESTART:
-				setIntakePos(distance);
-				intakeState = IntakeState.INTAKEOUT;
 
-			case INTAKEOUT:
-				if (intakeDrive.getCurrentPosition() > 250) {
-					intakeDown();
-					spinIntake();
-					closeLock();
-					opmodeTimer.resetTimer();
-					intakeState = IntakeState.INTAKEDOWN;
-				}
-				break;
-			case INTAKEDOWN:
-				if (opmodeTimer.getElapsedTimeSeconds() > 2) {
-					intakeUp();
-					spinIntake(0.2);
-					opmodeTimer.resetTimer();
-					intakeState = IntakeState.INTAKEUP;
-				}
-				break;
-			case INTAKEUP:
-				if (opmodeTimer.getElapsedTimeSeconds() > 0.5) {
-					setIntakePos(0);
-					openLock();
-					intakeState = IntakeState.INTAKESTART;
-				}
-				break;
-		}
-	}
+
+//	public void grabSample(int distance) {
+//		switch (intakeState){
+//			case INTAKESTART:
+//				setIntakePos(distance);
+//				intakeState = IntakeState.INTAKEOUT;
+//
+//			case INTAKEOUT:
+//				if (intakeDrive.getCurrentPosition() > 250) {
+//					intakeDown();
+//					spinIntake();
+//					closeLock();
+//					opmodeTimer.resetTimer();
+//					intakeState = IntakeState.INTAKEDOWN;
+//				}
+//				break;
+//			case INTAKEDOWN:
+//				if (opmodeTimer.getElapsedTimeSeconds() > 2) {
+//					intakeUp();
+//					spinIntake(0.2);
+//					opmodeTimer.resetTimer();
+//					intakeState = IntakeState.INTAKEUP;
+//				}
+//				break;
+//			case INTAKEUP:
+//				if (opmodeTimer.getElapsedTimeSeconds() > 0.5) {
+//					setIntakePos(0);
+//					openLock();
+//					intakeState = IntakeState.INTAKESTART;
+//				}
+//				break;
+//		}
+//	}
 	//endregion
 	//region Deposit Methods
-	public void closeClaw() {
-		clawServo.setPosition(RConstants.CLAWPOSITIONCLOSED);
-	}
-
-	public void openClaw() {
-		clawServo.setPosition(RConstants.CLAWPOSITIONOPEN);
-	}
-
-	public void wristDown() {
-		wristServo.setPosition(RConstants.WRISTPOSITIONDOWN);
-	}
-
-	public void wristBack() {
-		wristServo.setPosition(RConstants.WRISTPOSITIONOUT);
-	}
-
-	public void armDeposit() {
-		armServo.setPosition(RConstants.ARMPOSITIONDEPOSIT);
-	}
-
-	public void armHover() {
-		armServo.setPosition(RConstants.ARMPOSITIONHOVER);
-	}
-
-	public void armGrab() {
-		armServo.setPosition(RConstants.ARMPOSITIONGRAB);
-	}
+//	public void closeClaw() {
+//		clawServo.setPosition(RConstants.CLAWPOSITIONCLOSED);
+//	}
+//
+//	public void openClaw() {
+//		clawServo.setPosition(RConstants.CLAWPOSITIONOPEN);
+//	}
+//
+//	public void wristDown() {
+//		wristServo.setPosition(RConstants.WRISTPOSITIONDOWN);
+//	}
+//
+//	public void wristBack() {
+//		wristServo.setPosition(RConstants.WRISTPOSITIONOUT);
+//	}
+//
+//	public void armDeposit() {
+//		armServo.setPosition(RConstants.ARMPOSITIONDEPOSIT);
+//	}
+//
+//	public void armHover() {
+//		armServo.setPosition(RConstants.ARMPOSITIONHOVER);
+//	}
+//
+//	public void armGrab() {
+//		armServo.setPosition(RConstants.ARMPOSITIONGRAB);
+//	}
 	enum DepositState {
 		IDLE,
 		CLOSE_CLAW,
@@ -467,59 +577,7 @@ public class Auto04 extends OpMode {
 		RESET,
 		COMPLETE
 	}
-	public void scoreSample() {
-		// Get the current time in milliseconds
-		long currentTime = opmodeTimer.getElapsedTime();
 
-		switch (depositState) {
-			case IDLE:
-				closeClaw();
-				stateStartTime = currentTime; // Record the time
-				depositState = DepositState.CLOSE_CLAW;
-				break;
-
-			case CLOSE_CLAW:
-				if (currentTime - stateStartTime >= 200) { // Wait 200ms
-					armDeposit();
-					backPid.setTargetPosition(RConstants.HIGHBASKET);
-					depositState = DepositState.MOVE_ARM;
-				}
-				break;
-
-			case MOVE_ARM:
-				if (currentTime - stateStartTime >= 200) { // Wait 200ms
-					wristBack();
-					stateStartTime = currentTime;
-					depositState = DepositState.MOVE_WRIST;
-				}
-				break;
-
-			case MOVE_WRIST:
-				if (currentTime - stateStartTime >= 200) { // Wait 200ms
-					openClaw();
-					stateStartTime = currentTime;
-					depositState = DepositState.RESET;
-				}
-				break;
-
-			case RESET:
-				if (currentTime - stateStartTime >= 200) { // Wait 200ms
-					armHover();
-					wristDown();
-					backPid.setTargetPosition(RConstants.DOWNPOSITION);
-					stateStartTime = currentTime;
-					depositState = DepositState.COMPLETE;
-				}
-				break;
-
-			case COMPLETE:
-				if (currentTime - stateStartTime > 200) { // Wait 200ms
-					depositState = DepositState.IDLE;
-				}
-				// All actions complete; stay idle or transition as needed
-				break;
-		}
-	}
 	//endregion
 
 	// This method is called continuously after Init while waiting for "play".

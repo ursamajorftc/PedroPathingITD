@@ -36,4 +36,16 @@ public class RConstants {
 	public static final double LEFTINTAKEUP = 0.32;
 	public static final double RIGHTINTAKEDOWN = 0.45;
 	public static final double LEFTINTAKEDOWN = 0.54;
+
+	public enum RobotState {
+		IDLE,
+		CLOSE_CLAW,
+		MOVE_ARM,
+		MOVE_WRIST,
+		OPEN_CLAW,
+		COMPLETE
+	}
+
 }
+
+
