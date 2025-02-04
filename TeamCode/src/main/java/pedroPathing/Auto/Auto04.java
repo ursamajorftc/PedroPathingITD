@@ -118,20 +118,6 @@ public class Auto04 extends OpMode {
 	// This method is called once at the init of the OpMode.
 	@Override
 	public void init() {
-		intakeCRSLeft = hardwareMap.get(CRServo.class, "intakeCRSLeft");
-		intakeCRSRight = hardwareMap.get(CRServo.class, "intakeCRSRight");
-		intakeServoLeft = hardwareMap.get(Servo.class, "intakeServoLeft");
-		intakeServoRight = hardwareMap.get(Servo.class, "intakeServoRight");
-		lockServo = hardwareMap.get(Servo.class, "lockServo");
-		intakeDrive = hardwareMap.get(DcMotor.class, "intakeDrive");
-
-		// Deposit
-		clawServo = hardwareMap.get(Servo.class, "clawServo");
-		wristServo = hardwareMap.get(Servo.class, "wristServo");
-		armServo = hardwareMap.get(Servo.class, "armServo");
-		outmoto1 = hardwareMap.get(DcMotorEx.class, "outmoto1");
-		outmoto2 = hardwareMap.get(DcMotorEx.class, "outmoto2");
-
 		pathTimer = new Timer();
 		opmodeTimer = new Timer();
 		opmodeTimer.resetTimer();
@@ -328,10 +314,6 @@ public class Auto04 extends OpMode {
 	// This is the main loop of the OpMode, it will run repeatedly after clicking "Play".
 	@Override
 	public void loop() {
-
-
-
-
 
 		// These loop the movements of the robot
 		follower.update();
