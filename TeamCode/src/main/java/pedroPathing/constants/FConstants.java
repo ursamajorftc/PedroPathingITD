@@ -4,6 +4,7 @@ import com.pedropathing.localization.Localizers;
 import com.pedropathing.follower.FollowerConstants;
 import com.pedropathing.util.CustomFilteredPIDFCoefficients;
 import com.pedropathing.util.CustomPIDFCoefficients;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 public class FConstants {
@@ -20,6 +21,7 @@ public class FConstants {
         FollowerConstants.rightFrontMotorDirection = DcMotorSimple.Direction.REVERSE;
         FollowerConstants.rightRearMotorDirection = DcMotorSimple.Direction.REVERSE;
 
+
         FollowerConstants.mass = 13.15;
 
         FollowerConstants.xMovement = 48.4554;
@@ -27,6 +29,7 @@ public class FConstants {
 
         FollowerConstants.forwardZeroPowerAcceleration = -36.6276;
         FollowerConstants.lateralZeroPowerAcceleration = -73.1229;
+
 
         FollowerConstants.translationalPIDFCoefficients.setCoefficients(0.4, 0, 0.02, 0);
         FollowerConstants.headingPIDFCoefficients.setCoefficients(2, 0, 0.1, 0);

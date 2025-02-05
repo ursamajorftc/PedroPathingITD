@@ -19,6 +19,7 @@ public class IntakeController {
 	public void run() {
 		double joystickInput = -gamepad1.left_stick_y * Math.abs(gamepad1.left_stick_y) ;
 		int intakePosition = intakeDrive.getCurrentPosition();
+		
 
 		intakeTargetPosition = intakeTargetPosition + (int)(joystickInput * 80);
 
@@ -26,6 +27,9 @@ public class IntakeController {
 			intakeTargetPosition = MIN_POSITION;
 		} else if (intakeTargetPosition > MAX_POSITION) {
 			intakeTargetPosition = MAX_POSITION;
+		}
+		if (gamepad1.y){
+			intakeTargetPosition = 0;
 		}
 		intakeDrive.setTargetPosition(intakeTargetPosition);
 		intakeDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);

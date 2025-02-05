@@ -5,6 +5,7 @@ import android.view.View;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.localization.Pose;
 import com.pedropathing.util.Constants;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
@@ -17,7 +18,8 @@ import pedroPathing.constants.*;
 import pedroPathing.pid.PIDController;
 //endregion
 
-@TeleOp(name = "mainTeleOp", group = "Linear OpMode")
+@Disabled
+@TeleOp(name = "mainTeleOpnuhuh", group = "Linear OpMode")
 public class mainTeleOp extends OpMode {
 	//region Initializations
 	private Follower follower;
