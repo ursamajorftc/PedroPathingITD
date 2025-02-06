@@ -190,7 +190,7 @@ public class mainTeleOpReal extends LinearOpMode {
 			int state = 0;
 
 			while (opModeIsActive()) {
-				follower.setTeleOpMovementVectors(-gamepad2.left_stick_y, -gamepad2.left_stick_x, -gamepad2.right_stick_x * 0.85, true);
+				follower.setTeleOpMovementVectors(-gamepad2.left_stick_y, -gamepad2.left_stick_x, -gamepad2.right_stick_x * 0.65, true);
 				follower.update();
 
 //				drive.setDrivePowers(new PoseVelocity2d(

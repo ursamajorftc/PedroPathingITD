@@ -4,14 +4,14 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 public class RConstants {
 	//wrist positions
-	public static final double WRISTPOSITIONDOWN = 0;
+	public static final double WRISTPOSITIONDOWN = 0.07;
 	public static final double WRISTPOSITIONSTRAIGHT = 0.62;
 	public static final double WRISTPOSITIONOUT = 1;
 
 	//arm positions
 	public static final double ARMPOSITIONDEPOSIT = 0.475;
-	public static final double ARMPOSITIONHOVER = 0.815;
-	public static final double ARMPOSITIONGRAB = 0.95;
+	public static final double ARMPOSITIONHOVER = 0.855;
+	public static final double ARMPOSITIONGRAB = 0.97;
 	public static final int HIGHBASKET = 1100;
 	public static final int LOWBASKET = 530;
 	public static final int DOWNPOSITION = 0;
@@ -44,6 +44,11 @@ public class RConstants {
 		MOVE_WRIST,
 		OPEN_CLAW,
 		COMPLETE
+	}
+
+	public enum DepositState {
+		UP,
+		DOWN
 	}
 
 	public enum IntakeState {
