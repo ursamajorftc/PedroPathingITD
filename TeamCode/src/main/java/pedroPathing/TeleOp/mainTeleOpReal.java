@@ -72,6 +72,8 @@ public class mainTeleOpReal extends LinearOpMode {
 	private Servo intakeServoRight = null;
 	private Servo lockServo = null;
 	private DcMotor intakeDrive = null;
+	private DcMotor specDrive = null;
+	private Servo specServo = null;
 	private Servo clawServo = null;
 	private Servo wristServo = null;
 	private Servo armServo = null;
@@ -160,6 +162,14 @@ public class mainTeleOpReal extends LinearOpMode {
 		outmoto1.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
 		outmoto2.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
 
+		specDrive = hardwareMap.get(DcMotor.class, "specDrive");
+		specServo = hardwareMap.get(Servo.class,"specServo");
+
+		specDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+		specDrive.setTargetPosition(0);
+		specDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+
 
 
 
@@ -210,6 +220,16 @@ public class mainTeleOpReal extends LinearOpMode {
 				double color = hsvValues[0];
 
 				// Setup a variable for each drive wheel to save power level for telemetry
+
+				if (gamepad2.a){
+					specDrive.setTargetPosition(400);
+					specDrive.setPower(1);
+				}
+				if (gamepad2.b) {
+					specScore = true;
+				}
+				SpecScore();
+
 				if (gamepad1.x) {
 					intakeCRSLeft.setPower(1);
 					intakeCRSRight.setPower(-1);
@@ -309,6 +329,7 @@ public class mainTeleOpReal extends LinearOpMode {
 				telemetry.addData("X", follower.getPose().getX());
 				telemetry.addData("Y", follower.getPose().getY());
 				telemetry.addData("Heading in Degrees", Math.toDegrees(follower.getPose().getHeading()));
+				telemetry.addData("specDrive position", specDrive.getCurrentPosition());
 				telemetry.update();
 			}
 		}
@@ -317,6 +338,17 @@ public class mainTeleOpReal extends LinearOpMode {
 	// to make sure that the thread doesn't hinder other operations
 	int peckState = 0;
 	long peckTime = 0;
+
+	public boolean specScore = false;
+	public void SpecScore() {
+		if (specScore) {
+			specDrive.setTargetPosition(0);
+		}
+		if ((specDrive.getTargetPosition() == 0) && specDrive.getCurrentPosition() < 300) {
+			specServo.setPosition(0.3);
+			specScore = false;
+		}
+	}
 
 	public void peckArm() {
 		if (gamepad2.right_bumper) {
