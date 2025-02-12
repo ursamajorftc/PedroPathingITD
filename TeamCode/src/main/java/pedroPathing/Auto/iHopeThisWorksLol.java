@@ -30,7 +30,7 @@ import pedroPathing.pid.PIDController;
 
 // This is a 0+4 (Specimen + Sample) bucket auto. It scores a neutral preload and then pickups 3 samples from the ground and scores them before parking in the submersible zone.
 
-@Autonomous(name = "i hope this works", group = "Examples")
+@Autonomous(name = "4 Samples", group = "Examples")
 public class iHopeThisWorksLol extends OpMode {
 
 
@@ -280,7 +280,7 @@ public class iHopeThisWorksLol extends OpMode {
             case 0:
 
                 follower.followPath(scorePreload, true);
-                backPid.setTargetPosition(1150);
+                backPid.setTargetPosition(1153);
 
 
                 setPathState(1);
@@ -290,7 +290,7 @@ public class iHopeThisWorksLol extends OpMode {
 
                 break;
             case 1:
-                if (!scored && (outmoto1.getCurrentPosition() > 1150)) {
+                if (!follower.isBusy() && !scored && (outmoto1.getCurrentPosition() > 1140)) {
                     armServo.setPosition(RConstants.ARMPOSITIONDEPOSIT);
                     wristServo.setPosition(RConstants.WRISTPOSITIONOUT);
                     clawServo.setPosition(RConstants.CLAWPOSITIONOPEN);
@@ -363,7 +363,7 @@ public class iHopeThisWorksLol extends OpMode {
                 }
 
                 if (transferComplete && depositState.equals(RConstants.DepositState.DOWN)) {
-                    backPid.setTargetPosition(1150);
+                    backPid.setTargetPosition(1160);
                     depositState = RConstants.DepositState.UP;
                 }
 
@@ -449,7 +449,7 @@ public class iHopeThisWorksLol extends OpMode {
                 }
 
                 if (transferComplete && depositState.equals(RConstants.DepositState.DOWN)) {
-                    backPid.setTargetPosition(1150);
+                    backPid.setTargetPosition(1160);
                     depositState = RConstants.DepositState.UP;
 
                 }
@@ -535,7 +535,7 @@ public class iHopeThisWorksLol extends OpMode {
                 }
 
                 if (transferComplete && depositState.equals(RConstants.DepositState.DOWN)) {
-                    backPid.setTargetPosition(1150);
+                    backPid.setTargetPosition(1160);
                     depositState = RConstants.DepositState.UP;
 
                 }

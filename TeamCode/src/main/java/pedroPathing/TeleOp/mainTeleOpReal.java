@@ -219,10 +219,14 @@ public class mainTeleOpReal extends LinearOpMode {
 				Color.colorToHSV(colors.toColor(), hsvValues);
 				double color = hsvValues[0];
 
+
 				// Setup a variable for each drive wheel to save power level for telemetry
 
 				if (gamepad2.a){
-					specDrive.setTargetPosition(400);
+
+					specServo.setPosition(0.55);
+					sleep(200);
+					specDrive.setTargetPosition(420);
 					specDrive.setPower(1);
 				}
 				if (gamepad2.b) {
@@ -245,10 +249,10 @@ public class mainTeleOpReal extends LinearOpMode {
 					intakeCRSLeft.setPower(-0.15);
 					intakeCRSRight.setPower(0.15);
 				}
-				if (intakeDrive.getCurrentPosition() < 150 && previousIntakeState) {
+				if (intakeDrive.getCurrentPosition() < 50 && previousIntakeState) {
 					lockServo.setPosition(0.3);
-					intakeCRSLeft.setPower(-0.5);
-					intakeCRSRight.setPower(0.5);
+					intakeCRSLeft.setPower(-0.2);
+					intakeCRSRight.setPower(0.2);
 					previousIntakeState = false;
 				}
 				if ((gamepad1.right_trigger > 0.25)) {
@@ -340,11 +344,18 @@ public class mainTeleOpReal extends LinearOpMode {
 	long peckTime = 0;
 
 	public boolean specScore = false;
+	public boolean specPickUp = false;
+	public long specTimer = 0;
+
+	public void speckPickUp() {
+	}
 	public void SpecScore() {
 		if (specScore) {
 			specDrive.setTargetPosition(0);
+			specDrive.setPower(0.4);
 		}
-		if ((specDrive.getTargetPosition() == 0) && specDrive.getCurrentPosition() < 300) {
+
+		if ((specDrive.getTargetPosition() == 0) && specDrive.getCurrentPosition() < 250) {
 			specServo.setPosition(0.3);
 			specScore = false;
 		}
