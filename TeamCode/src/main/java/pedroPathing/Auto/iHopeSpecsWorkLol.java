@@ -2,6 +2,7 @@ package pedroPathing.Auto;
 
 import com.pedropathing.follower.Follower;
 import com.pedropathing.localization.Pose;
+import com.pedropathing.pathgen.BezierCurve;
 import com.pedropathing.pathgen.BezierLine;
 import com.pedropathing.pathgen.PathChain;
 import com.pedropathing.pathgen.Point;
@@ -9,6 +10,7 @@ import com.pedropathing.util.Constants;
 import com.pedropathing.util.Timer;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import  com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.hardware.DcMotor;
 
 import pedroPathing.constants.FConstants;
 import pedroPathing.constants.LConstants;
@@ -28,6 +30,7 @@ public class iHopeSpecsWorkLol extends OpMode {
 
     private Follower follower;
     private Timer pathTimer, actionTimer, opmodeTimer;
+    private DcMotor intakeDrive = null;
 
     /** This is the variable where we store the state of our auto.
      * It is used by the pathUpdate method. */
@@ -35,17 +38,18 @@ public class iHopeSpecsWorkLol extends OpMode {
 
 
 
-    private final Pose startPose = new Pose(9, 111, Math.toRadians(270));
-    private final Pose scorePose1 = new Pose(14, 129, Math.toRadians(315));
-    private final Pose endPush1 = new Pose(37, 121, Math.toRadians(0));
-    private final Pose endPush2 = new Pose(43, 130, Math.toRadians(0));
-    private final Pose startPush3 = new Pose(49, 135, Math.toRadians(0));
-    private final Pose endPush3 = new Pose(60, 98, Math.toRadians(90));
-    private final Pose scorePose2 = new Pose(60, 98, Math.toRadians(90));
-    private final Pose grabPose = new Pose(60, 98, Math.toRadians(90));
-    private final Pose scorePose3 = new Pose(60, 98, Math.toRadians(90));
-    private final Pose scorePose4 = new Pose(60, 98, Math.toRadians(90));
-    private final Pose scorePose5 = new Pose(60, 98, Math.toRadians(90));
+    private final Pose startPose = new Pose(8.401, 68, Math.toRadians(180));
+    private final Pose scorePose1 = new Pose(29, 73, Math.toRadians(180));
+    private final Pose startPush1 = new Pose(38, 47, Math.toRadians(180));
+    private final Pose endPush1 = new Pose(22, 42, Math.toRadians(185));
+    private final Pose endPush2 = new Pose(22, 32, Math.toRadians(185));
+    private final Pose startPush3 = new Pose(59.482, 7.057, Math.toRadians(180));
+    private final Pose endPush3 = new Pose(9.746, 6.553, Math.toRadians(180));
+    private final Pose scorePose2 = new Pose(29, 72, Math.toRadians(180));
+    private final Pose grabPose = new Pose(9.074, 28.397, Math.toRadians(180));
+    private final Pose scorePose3 = new Pose(29, 71, Math.toRadians(180));
+    private final Pose scorePose4 = new Pose(29, 70, Math.toRadians(180));
+    private final Pose scorePose5 = new Pose(29, 69, Math.toRadians(180));
 
     /** Park Control Pose for our robot, this is used to manipulate the bezier curve that we will create for the parking.
      * The Robot will not go to this pose, it is used a control point for our bezier curve. */
@@ -88,34 +92,46 @@ public class iHopeSpecsWorkLol extends OpMode {
                                 new Point(scorePose1)
                         )
                 )
-                .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))
+                .setConstantHeadingInterpolation(Math.toRadians(180))
                 .build();
         push1 = follower.pathBuilder()
                 .addPath(
-                        new BezierLine(
+                        new BezierCurve(
                                 new Point(scorePose1),
+                                new Point(19, 43, Point.CARTESIAN),
+                                new Point(startPush1)
+                        )
+                )
+                .setConstantHeadingInterpolation(Math.toRadians(180))
+                .addPath(
+                        new BezierCurve(
+                                new Point(startPush1),
+                                new Point(55, 36, Point.CARTESIAN),
                                 new Point(endPush1)
                         )
                 )
-                .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))
-                .build();
-        push2 = follower.pathBuilder()
+
+                .setConstantHeadingInterpolation(Math.toRadians(185))
                 .addPath(
-                        new BezierLine(
-                                new Point(endPush1),
-                                new Point(endPush2)
-                        )
+                new BezierCurve(
+                        new Point(endPush1),
+                        new Point(65, 39.5, Point.CARTESIAN),
+                        new Point(endPush2)
                 )
-                .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))
+        )
+                .setConstantHeadingInterpolation(Math.toRadians(185))
                 .build();
+//        push2 = follower.pathBuilder()
+
         prePush3 = follower.pathBuilder()
                 .addPath(
-                        new BezierLine(
+                        new BezierCurve(
                                 new Point(endPush2),
+                                new Point(69.228, 15.963, Point.CARTESIAN),
                                 new Point(startPush3)
                         )
                 )
-                .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))
+                .setConstantHeadingInterpolation(Math.toRadians(180))
                 .build();
         push3 = follower.pathBuilder()
                 .addPath(
@@ -124,7 +140,7 @@ public class iHopeSpecsWorkLol extends OpMode {
                                 new Point(endPush3)
                         )
                 )
-                .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))
+                .setConstantHeadingInterpolation(Math.toRadians(180))
                 .build();
         score2 = follower.pathBuilder()
                 .addPath(
@@ -133,7 +149,7 @@ public class iHopeSpecsWorkLol extends OpMode {
                                 new Point(scorePose2)
                         )
                 )
-                .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))
+                .setConstantHeadingInterpolation(Math.toRadians(180))
                 .build();
         grab3 = follower.pathBuilder()
                 .addPath(
@@ -142,7 +158,7 @@ public class iHopeSpecsWorkLol extends OpMode {
                                 new Point(grabPose)
                         )
                 )
-                .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))
+                .setConstantHeadingInterpolation(Math.toRadians(180))
                 .build();
         score3 = follower.pathBuilder()
                 .addPath(
@@ -151,7 +167,7 @@ public class iHopeSpecsWorkLol extends OpMode {
                                 new Point(scorePose3)
                         )
                 )
-                .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))
+                .setConstantHeadingInterpolation(Math.toRadians(180))
                 .build();
         grab4 = follower.pathBuilder()
                 .addPath(
@@ -160,7 +176,7 @@ public class iHopeSpecsWorkLol extends OpMode {
                                 new Point(grabPose)
                         )
                 )
-                .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))
+                .setConstantHeadingInterpolation(Math.toRadians(180))
                 .build();
         score4 = follower.pathBuilder()
                 .addPath(
@@ -169,7 +185,7 @@ public class iHopeSpecsWorkLol extends OpMode {
                                 new Point(scorePose4)
                         )
                 )
-                .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))
+                .setConstantHeadingInterpolation(Math.toRadians(180))
                 .build();
         grab5 = follower.pathBuilder()
                 .addPath(
@@ -178,7 +194,7 @@ public class iHopeSpecsWorkLol extends OpMode {
                                 new Point(grabPose)
                         )
                 )
-                .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))
+                .setConstantHeadingInterpolation(Math.toRadians(180))
                 .build();
         score5 = follower.pathBuilder()
                 .addPath(
@@ -187,7 +203,7 @@ public class iHopeSpecsWorkLol extends OpMode {
                                 new Point(scorePose5)
                         )
                 )
-                .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))
+                .setConstantHeadingInterpolation(Math.toRadians(180))
                 .build();
 
 
@@ -215,79 +231,115 @@ public class iHopeSpecsWorkLol extends OpMode {
                     /* Score Preload */
 
                     /* Since this is a pathChain, we can have Pedro hold the end point while we are grabbing the sample */
-                    follower.followPath(grabPickup1,true);
+                    follower.followPath(push1,true);
                     setPathState(2);
                 }
                 break;
-            case 2:
-                /* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the endPush1's position */
-                if(!follower.isBusy()) {
-                    /* Grab Sample */
-
-                    /* Since this is a pathChain, we can have Pedro hold the end point while we are scoring the sample */
-                    follower.followPath(scorePickup1,true);
-                    setPathState(3);
-                }
-                break;
-            case 3:
-                /* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the scorePose1's position */
-                if(!follower.isBusy()) {
-                    /* Score Sample */
-
-                    /* Since this is a pathChain, we can have Pedro hold the end point while we are grabbing the sample */
-                    follower.followPath(grabPickup2,true);
-                    setPathState(4);
-                }
-                break;
-            case 4:
-                /* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the pickup2Pose's position */
-                if(!follower.isBusy()) {
-                    /* Grab Sample */
-
-                    /* Since this is a pathChain, we can have Pedro hold the end point while we are scoring the sample */
-                    follower.followPath(scorePickup2,true);
-                    setPathState(5);
-                }
-                break;
-            case 5:
-                /* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the scorePose1's position */
-                if(!follower.isBusy()) {
-                    /* Score Sample */
-
-                    /* Since this is a pathChain, we can have Pedro hold the end point while we are grabbing the sample */
-                    follower.followPath(grabPickup3,true);
-                    setPathState(6);
-                }
-                break;
-            case 6:
-                /* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the pickup3Pose's position */
-                if(!follower.isBusy()) {
-                    /* Grab Sample */
-
-                    /* Since this is a pathChain, we can have Pedro hold the end point while we are scoring the sample */
-                    follower.followPath(scorePickup3, true);
-                    setPathState(7);
-                }
-                break;
-            case 7:
-                /* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the scorePose1's position */
-                if(!follower.isBusy()) {
-                    /* Score Sample */
-
-                    /* Since this is a pathChain, we can have Pedro hold the end point while we are parked */
-                    follower.followPath(park,true);
-                    setPathState(8);
-                }
-                break;
-            case 8:
-                /* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the scorePose1's position */
-                if(!follower.isBusy()) {
-                    /* Level 1 Ascent */
-
-                    /* Set the state to a Case we won't use or define, so it just stops running an new paths */
-                    setPathState(-1);
-                }
-                break;
+//            case 2:
+//                /* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the endPush1's position */
+//                if(!follower.isBusy()) {
+//                    /* Grab Sample */
+//
+//                    /* Since this is a pathChain, we can have Pedro hold the end point while we are scoring the sample */
+//                    follower.followPath(push2,true);
+//                    setPathState(3);
+//                }
+//                break;
+//            case 3:
+//                /* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the scorePose1's position */
+//                if(!follower.isBusy()) {
+//                    /* Score Sample */
+//
+//                    /* Since this is a pathChain, we can have Pedro hold the end point while we are grabbing the sample */
+//                    follower.followPath(prePush3,true);
+//                    setPathState(4);
+//                }
+//                break;
+//            case 4:
+//                /* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the pickup2Pose's position */
+//                if(!follower.isBusy()) {
+//                    /* Grab Sample */
+//
+//                    /* Since this is a pathChain, we can have Pedro hold the end point while we are scoring the sample */
+//                    follower.followPath(push3,true);
+//                    setPathState(5);
+//                }
+//                break;
+//            case 5:
+//                /* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the scorePose1's position */
+//                if(!follower.isBusy()) {
+//                    /* Score Sample */
+//
+//                    /* Since this is a pathChain, we can have Pedro hold the end point while we are grabbing the sample */
+//                    follower.followPath(score2,true);
+//                    setPathState(6);
+//                }
+//                break;
+//            case 6:
+//                /* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the pickup3Pose's position */
+//                if(!follower.isBusy()) {
+//                    /* Grab Sample */
+//
+//                    /* Since this is a pathChain, we can have Pedro hold the end point while we are scoring the sample */
+//                    follower.followPath(grab3, true);
+//                    setPathState(7);
+//                }
+//                break;
+//            case 7:
+//                /* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the scorePose1's position */
+//                if(!follower.isBusy()) {
+//                    /* Score Sample */
+//
+//                    /* Since this is a pathChain, we can have Pedro hold the end point while we are parked */
+//                    follower.followPath(score3,true);
+//                    setPathState(8);
+//                }
+//                break;
+//            case 8:
+//                if(!follower.isBusy()) {
+//                    /* Action */
+//
+//                    /* Path */
+//                    follower.followPath(grab4,true);
+//                    setPathState(9);
+//                }
+//                break;
+//            case 9:
+//                if(!follower.isBusy()) {
+//                    /* Action */
+//
+//                    /* Path */
+//                    follower.followPath(score4,true);
+//                    setPathState(10);
+//                }
+//                break;
+//            case 10:
+//                if(!follower.isBusy()) {
+//                    /* Action */
+//
+//                    /* Path */
+//                    follower.followPath(grab5,true);
+//                    setPathState(11);
+//                }
+//                break;
+//            case 11:
+//                if(!follower.isBusy()) {
+//                    /* Action */
+//
+//                    /* Path */
+//                    follower.followPath(score5,true);
+//                    setPathState(12);
+//                }
+//                break;
+//            case 12:
+//                /* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the scorePose1's position */
+//                if(!follower.isBusy()) {
+//                    /* Level 1 Ascent */
+//
+//                    /* Set the state to a Case we won't use or define, so it just stops running an new paths */
+//                    setPathState(-1);
+//                }
+//                break;
         }
     }
 
@@ -325,6 +377,12 @@ public class iHopeSpecsWorkLol extends OpMode {
         follower = new Follower(hardwareMap);
         follower.setStartingPose(startPose);
         buildPaths();
+
+        intakeDrive = hardwareMap.get(DcMotor.class, "intakeDrive");
+        intakeDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        intakeDrive.setTargetPosition(0);
+        intakeDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
     }
 
     /** This method is called continuously after Init while waiting for "play". **/
