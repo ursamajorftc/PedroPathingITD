@@ -179,6 +179,7 @@ public class mainTeleOpReal extends LinearOpMode {
 
 		armServo.setPosition(0.475);
 		wristServo.setPosition(wristPositionDown);
+        
 
 
 		// Wait for the game to start (driver presses START)
