@@ -19,6 +19,8 @@ public class limeLightTest extends LinearOpMode {
     private double[] block_data;
     private double angle;
 
+
+
     @Override
     public void runOpMode() throws InterruptedException {
         limelight = hardwareMap.get(Limelight3A.class, "limelight");
@@ -26,6 +28,8 @@ public class limeLightTest extends LinearOpMode {
         limelight.start();
 
         testServo = hardwareMap.get(Servo.class, "testServo");
+
+        waitForStart();
 
         while (opModeIsActive()){
             result = limelight.getLatestResult();
