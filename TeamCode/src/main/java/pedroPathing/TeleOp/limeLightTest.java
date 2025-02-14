@@ -35,7 +35,7 @@ public class limeLightTest extends LinearOpMode {
             result = limelight.getLatestResult();
             block_data = result.getPythonOutput();
             angle = block_data[5];
-            testServo.setPosition(Math.abs(angle)/90);
+            testServo.setPosition(Math.abs(angle)/180);
         }
     }
 }
