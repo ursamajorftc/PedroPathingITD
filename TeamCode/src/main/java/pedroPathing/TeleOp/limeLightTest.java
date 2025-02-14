@@ -27,6 +27,8 @@ public class limeLightTest extends LinearOpMode {
         limelight.pipelineSwitch(0);
         limelight.start();
 
+        limelight.setPollRateHz(30);
+
         testServo = hardwareMap.get(Servo.class, "testServo");
 
         waitForStart();
