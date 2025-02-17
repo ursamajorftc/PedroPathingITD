@@ -18,7 +18,7 @@ public class RConstants {
 
 	//claw positions
 	public static final double CLAWPOSITIONOPEN = 0.26;
-	public static final double CLAWPOSITIONCLOSED = 0.48;
+	public static final double CLAWPOSITIONCLOSED = 0.46;
 
 	//spec Claw positions
 	public static final double SPECCLAWOPEN = 0.3;
@@ -26,7 +26,7 @@ public class RConstants {
 
 	// spec Arm positions
 
-	public static final int  SPECARMUP = 400;
+	public static final int  SPECARMUP = 420;
 	public static final int SPECARMDOWN = 0;
 
 

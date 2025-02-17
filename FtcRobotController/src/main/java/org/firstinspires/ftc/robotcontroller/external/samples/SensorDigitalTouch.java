@@ -37,7 +37,7 @@ import com.qualcomm.robotcore.hardware.DigitalChannel;
 /*
  * This OpMode demonstrates how to use a digital channel.
  *
- * The OpMode assumes that the digital channel is configured with a name of "digitalTouch".
+ * The OpMode assumes that the digital channel is configured with a name of "touchSensor".
  *
  * Use Android Studio to Copy this Class, and Paste it into your team's code folder with a new name.
  * Remove or comment out the @Disabled line to add this OpMode to the Driver Station OpMode list.
@@ -45,16 +45,16 @@ import com.qualcomm.robotcore.hardware.DigitalChannel;
 @TeleOp(name = "Sensor: digital channel", group = "Sensor")
 @Disabled
 public class SensorDigitalTouch extends LinearOpMode {
-    DigitalChannel digitalTouch;  // Digital channel Object
+    DigitalChannel touchSensor;  // Digital channel Object
 
     @Override
     public void runOpMode() {
 
         // get a reference to our touchSensor object.
-        digitalTouch = hardwareMap.get(DigitalChannel.class, "digitalTouch");
+        touchSensor = hardwareMap.get(DigitalChannel.class, "touchSensor");
 
-        digitalTouch.setMode(DigitalChannel.Mode.INPUT);
-        telemetry.addData("DigitalTouchSensorExample", "Press start to continue...");
+        touchSensor.setMode(DigitalChannel.Mode.INPUT);
+        telemetry.addData("touchSensorSensorExample", "Press start to continue...");
         telemetry.update();
 
         // wait for the start button to be pressed.
@@ -66,7 +66,7 @@ public class SensorDigitalTouch extends LinearOpMode {
 
             // button is pressed if value returned is LOW or false.
             // send the info back to driver station using telemetry function.
-            if (digitalTouch.getState() == false) {
+            if (touchSensor.getState() == false) {
                 telemetry.addData("Button", "PRESSED");
             } else {
                 telemetry.addData("Button", "NOT PRESSED");

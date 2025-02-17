@@ -12,6 +12,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.TouchSensor;
 
 import pedroPathing.constants.FConstants;
 import pedroPathing.constants.LConstants;
@@ -31,10 +32,12 @@ import pedroPathing.constants.RConstants;
 public class iHopeSpecsWorkLol extends OpMode {
 
     private Follower follower;
-    private Timer pathTimer, actionTimer, opmodeTimer;
-    private DcMotor intakeDrive = null;
+    private Timer pathTimer, opmodeTimer, scoreTimer;
+//    private DcMotor intakeDrive = null;
     private DcMotor specDrive = null;
     private Servo specServo = null;
+    TouchSensor rightTouchSensor;
+    TouchSensor leftTouchSensor;
 
     /**
      * This is the variable where we store the state of our auto.
@@ -44,23 +47,29 @@ public class iHopeSpecsWorkLol extends OpMode {
 
 
     private final Pose startPose = new Pose(8.401, 68, Math.toRadians(180));
-    private final Pose scorePose1 = new Pose(28.5, 73, Math.toRadians(185));
-    private final Pose startPush1 = new Pose(38, 47, Math.toRadians(180));
-    private final Pose endPush1 = new Pose(22, 42, Math.toRadians(185));
-    private final Pose endPush2 = new Pose(22, 32, Math.toRadians(185));
-    private final Pose startPush3 = new Pose(47, 29, Math.toRadians(185));
-    private final Pose endPush3 = new Pose(22, 29, Math.toRadians(185));
-    private final Pose scorePose2 = new Pose(26.4, 72, Math.toRadians(185));
-    private final Pose grabPose = new Pose(9, 42, Math.toRadians(185));
-    private final Pose scorePose3 = new Pose(26.4, 71, Math.toRadians(185));
-    private final Pose scorePose4 = new Pose(26.4, 70, Math.toRadians(185));
-    private final Pose scorePose5 = new Pose(26.4, 69, Math.toRadians(185));
 
-    /**
-     * Park Control Pose for our robot, this is used to manipulate the bezier curve that we will create for the parking.
-     * The Robot will not go to this pose, it is used a control point for our bezier curve.
-     */
-    private final Pose parkControlPose = new Pose(60, 98, Math.toRadians(90));
+    //push samples
+    private final Pose startPush1 = new Pose(38, 47, Math.toRadians(180));
+    private final Pose endPush1 = new Pose(22, 42, Math.toRadians(180));
+    private final Pose endPush2 = new Pose(22, 32, Math.toRadians(180));
+    private final Pose startPush3 = new Pose(58, 30, Math.toRadians(180));
+    private final Pose endPush3 = new Pose(23.5, 27.5, Math.toRadians(180));
+
+    //grab specs
+    private final Pose grabPose2 = new Pose(9.5, 37, Math.toRadians(185));
+    private final Pose grabPose3 = new Pose(7.7, 36, Math.toRadians(180));
+    private final Pose grabPose4 = new Pose(7.7, 36, Math.toRadians(180));
+    private final Pose grabPose5 = new Pose(7.7, 36, Math.toRadians(180));
+
+    //score specs
+    private final Pose scorePose1 = new Pose(29.5, 70.5, Math.toRadians(180));
+    private final Pose scorePose2 = new Pose(29, 70, Math.toRadians(180));
+    private final Pose scorePose3 = new Pose(29, 68, Math.toRadians(180));
+    private final Pose scorePose4 = new Pose(29, 67.5, Math.toRadians(180));
+    private final Pose scorePose5 = new Pose(29, 67, Math.toRadians(180));
+    private final Pose scoreControl = new Pose(25.5, 70);
+
+
 
     /* These are our Paths and PathChains that we will define in buildPaths() */
 //    private Path scorePreload;
@@ -88,8 +97,6 @@ public class iHopeSpecsWorkLol extends OpMode {
          * Here is a explanation of the difference between Paths and PathChains <https://pedropathing.com/commonissues/pathtopathchain.html> */
 
         /* This is our scorePreload path. We are using a BezierLine, which is a straight line. */
-//        scorePreload = new Path(new BezierLine(new Point(startPose), new Point(scorePose1)));
-//        scorePreload.setLinearHeadingInterpolation(startPose.getHeading(), scorePose1.getHeading());
 
         /* Here is an example for Constant Interpolation
         scorePreload.setConstantInterpolation(startPose.getHeading()); */
@@ -112,7 +119,7 @@ public class iHopeSpecsWorkLol extends OpMode {
                                 new Point(startPush1)
                         )
                 )
-                .setConstantHeadingInterpolation(Math.toRadians(185))
+                .setConstantHeadingInterpolation(Math.toRadians(180))
                 // push sample 1
                 .addPath(
                         new BezierCurve(
@@ -121,7 +128,7 @@ public class iHopeSpecsWorkLol extends OpMode {
                                 new Point(endPush1)
                         )
                 )
-                .setConstantHeadingInterpolation(Math.toRadians(185))
+                .setConstantHeadingInterpolation(Math.toRadians(180))
                 //push 2
                 .addPath(
                         new BezierCurve(
@@ -129,16 +136,16 @@ public class iHopeSpecsWorkLol extends OpMode {
                                 new Point(65, 39.5, Point.CARTESIAN),
                                 new Point(endPush2)
                         )
-                ).setConstantHeadingInterpolation(Math.toRadians(185))
+                ).setConstantHeadingInterpolation(Math.toRadians(180))
                 // get to point before pushing 3
                 .addPath(
                         new BezierCurve(
                                 new Point(endPush2),
-                                new Point(52, 38, Point.CARTESIAN),
+                                new Point(59, 38, Point.CARTESIAN),
                                 new Point(startPush3)
                         )
                 )
-                .setConstantHeadingInterpolation(Math.toRadians(185))
+                .setConstantHeadingInterpolation(Math.toRadians(180))
                 .setPathEndTValueConstraint(0.2)
                 //push 3
                 .addPath(
@@ -146,77 +153,84 @@ public class iHopeSpecsWorkLol extends OpMode {
                                 new Point(startPush3),
                                 new Point(endPush3)
                         )
-                ).setConstantHeadingInterpolation(Math.toRadians(185))
+                ).setConstantHeadingInterpolation(Math.toRadians(180))
                 .addPath(
                         new BezierLine(
                                 new Point(endPush3),
-                                new Point(grabPose)
+                                new Point(grabPose2)
                         )
                 ).setConstantHeadingInterpolation(Math.toRadians(185))
 
                 .build();
         score2 = follower.pathBuilder()
                 .addPath(
-                        new BezierLine(
-                                new Point(grabPose),
+                        new BezierCurve(
+                                new Point(grabPose2),
+                                new Point(scoreControl),
                                 new Point(scorePose2)
                         )
                 )
-                .setConstantHeadingInterpolation(Math.toRadians(185))
+                .setConstantHeadingInterpolation(Math.toRadians(180))
                 .build();
         grab3 = follower.pathBuilder()
                 .addPath(
-                        new BezierLine(
+                        new BezierCurve(
                                 new Point(scorePose2),
-                                new Point(grabPose)
+                                new Point(scoreControl),
+                                new Point(grabPose3)
                         )
                 )
-                .setConstantHeadingInterpolation(Math.toRadians(185))
+                .setConstantHeadingInterpolation(Math.toRadians(180))
                 .build();
         score3 = follower.pathBuilder()
                 .addPath(
-                        new BezierLine(
-                                new Point(grabPose),
+                        new BezierCurve(
+                                new Point(grabPose3),
+                                new Point(scoreControl),
                                 new Point(scorePose3)
                         )
                 )
-                .setConstantHeadingInterpolation(Math.toRadians(185))
+                .setConstantHeadingInterpolation(Math.toRadians(180))
                 .build();
         grab4 = follower.pathBuilder()
                 .addPath(
-                        new BezierLine(
+                        new BezierCurve(
                                 new Point(scorePose3),
-                                new Point(grabPose)
+                                new Point(scoreControl),
+                                new Point(grabPose4)
                         )
                 )
-                .setConstantHeadingInterpolation(Math.toRadians(185))
+                .setConstantHeadingInterpolation(Math.toRadians(180))
                 .build();
         score4 = follower.pathBuilder()
                 .addPath(
-                        new BezierLine(
-                                new Point(grabPose),
+                        new BezierCurve(
+                                new Point(grabPose4),
+                                new Point(scoreControl),
                                 new Point(scorePose4)
                         )
                 )
-                .setConstantHeadingInterpolation(Math.toRadians(185))
+                .setConstantHeadingInterpolation(Math.toRadians(180))
                 .build();
         grab5 = follower.pathBuilder()
                 .addPath(
-                        new BezierLine(
+                        new BezierCurve(
                                 new Point(scorePose4),
-                                new Point(grabPose)
+                                new Point(scoreControl),
+                                new Point(grabPose5)
                         )
                 )
-                .setConstantHeadingInterpolation(Math.toRadians(185))
+                .setConstantHeadingInterpolation(Math.toRadians(180))
                 .build();
         score5 = follower.pathBuilder()
                 .addPath(
-                        new BezierLine(
-                                new Point(grabPose),
+                        new BezierCurve(
+                                new Point(grabPose5),
+                                new Point(scoreControl),
                                 new Point(scorePose5)
                         )
                 )
-                .setConstantHeadingInterpolation(Math.toRadians(185))
+                .setConstantHeadingInterpolation(Math.toRadians(180))
                 .build();
 
 
@@ -246,7 +260,7 @@ public class iHopeSpecsWorkLol extends OpMode {
                 */
 
                 /* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the scorePose1's position */
-                if (!follower.isBusy() && !isSpecScore) {
+                if ((rightTouchSensor.isPressed() && leftTouchSensor.isPressed() || !follower.isBusy()) && !isSpecScore) {
 //
                     /* Score Preload */
                     specScore = true;
@@ -255,14 +269,14 @@ public class iHopeSpecsWorkLol extends OpMode {
                     /* Since this is a pathChain, we can have Pedro hold the end point while we are grabbing the sample */
                 }
 
-                if ((specDrive.getCurrentPosition() < 200) && !follower.isBusy() && isSpecScore) {
+                if ((specDrive.getCurrentPosition() < 200) && isSpecScore) {
                     follower.followPath(pushSamples, true);
                     setPathState(2);
                 }
                 break;
             case 2:
                 /* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the endPush1's position */
-                if (!follower.isBusy() && !isSpecGrabbed) {
+                if ((!follower.isBusy() || (follower.getPose().getX() < grabPose2.getX())) && !isSpecGrabbed ) {
 
                     specGrabbed = false;
                     isSpecGrabbed = true;
@@ -270,75 +284,162 @@ public class iHopeSpecsWorkLol extends OpMode {
                     /* Since this is a pathChain, we can have Pedro hold the end point while we are scoring the sample */
                 }
 //
-//                if (specDrive.getCurrentPosition() > 100) {
-//                    follower.followPath(score2, true);
-//                    setPathState(3);
-//                }
-                break;
-            case 3:
-                /* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the scorePose1's position */
-                if (!follower.isBusy()) {
-                    /* Score Sample */
-
-                    /* Since this is a pathChain, we can have Pedro hold the end point while we are grabbing the sample */
-//                    follower.followPath(grab3, true);
-//                    setPathState(7);
+                if ((specServo.getPosition() == RConstants.SPECCLAWCLOSED) && (specDrive.getCurrentPosition() > 200)) {
+                    follower.followPath(score2,0.9, true);
+                    scoreTimer.resetTimer();
+                    setPathState(3);
+                    isSpecScore = false;
                 }
                 break;
-            case 7:
-                /* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the scorePose1's position */
-                if (!follower.isBusy()) {
-                    /* Score Sample */
+            case 3:
+                if ((rightTouchSensor.isPressed() && leftTouchSensor.isPressed()) && !isSpecScore) {
+//
+                    /* Score Preload */
+                    specScore = true;
+                    isSpecScore = true;
+                    follower.setPose(new Pose(28.5, follower.getPose().getY(), Math.toRadians(175)));
 
-                    /* Since this is a pathChain, we can have Pedro hold the end point while we are parked */
-                    follower.followPath(score3, true);
+                    telemetry.addData("specScore", specScore);
+
+                    /* Since this is a pathChain, we can have Pedro hold the end point while we are grabbing the sample */
+                } else if ((rightTouchSensor.isPressed() ^ leftTouchSensor.isPressed()) && scoreTimer.getElapsedTimeSeconds() >= 3) {
+                    specScore = true;
+                    isSpecScore = true;
+                    follower.setPose(new Pose(28.5, follower.getPose().getY(), Math.toRadians(175)));
+                }
+
+                if ((specDrive.getCurrentPosition() < 200) && isSpecScore) {
+                    follower.followPath(grab3, true);
+                    setPathState(7);
+                    isSpecGrabbed = false;
+                }
+                /* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the scorePose1's position */
+
+                break;
+            case 7:
+                if ((!follower.isBusy() || (follower.getPose().getX() < grabPose2.getX())) && !isSpecGrabbed) {
+
+                    specGrabbed = false;
+                    isSpecGrabbed = true;
+                    /* Grab Sample */
+                    /* Since this is a pathChain, we can have Pedro hold the end point while we are scoring the sample */
+                }
+//
+                if ((specServo.getPosition() == RConstants.SPECCLAWCLOSED) && (specDrive.getCurrentPosition() > 200)) {
+                    follower.followPath(score3, 0.9, true);
+                    scoreTimer.resetTimer();
                     setPathState(8);
+                    isSpecScore = false;
                 }
                 break;
             case 8:
-                if (!follower.isBusy()) {
-                    /* Action */
 
-                    /* Path */
+                if ((rightTouchSensor.isPressed() && leftTouchSensor.isPressed()) && !isSpecScore) {
+//
+                    /* Score Preload */
+                    specScore = true;
+                    isSpecScore = true;
+                    follower.setPose(new Pose(28.5, follower.getPose().getY(), Math.toRadians(175)));
+
+
+                    telemetry.addData("specScore", specScore);
+
+                    /* Since this is a pathChain, we can have Pedro hold the end point while we are grabbing the sample */
+                } else if ((rightTouchSensor.isPressed() ^ leftTouchSensor.isPressed()) && scoreTimer.getElapsedTimeSeconds() >= 3) {
+                    specScore = true;
+                    isSpecScore = true;
+                    follower.setPose(new Pose(28.5, follower.getPose().getY(), Math.toRadians(175)));
+                }
+
+                if ((specDrive.getCurrentPosition() < 200) && isSpecScore) {
                     follower.followPath(grab4, true);
                     setPathState(9);
+                    isSpecGrabbed = false;
+
                 }
                 break;
             case 9:
-                if (!follower.isBusy()) {
-                    /* Action */
+                if ((!follower.isBusy() || (follower.getPose().getX() < grabPose2.getX())) && !isSpecGrabbed) {
 
-                    /* Path */
-                    follower.followPath(score4, true);
-                    setPathState(10);
+                    specGrabbed = false;
+                    isSpecGrabbed = true;
+                    /* Grab Sample */
+                    /* Since this is a pathChain, we can have Pedro hold the end point while we are scoring the sample */
                 }
+//
+                if ((specServo.getPosition() == RConstants.SPECCLAWCLOSED) && (specDrive.getCurrentPosition() > 200)) {
+                    follower.followPath(score4,0.9, true);
+                    scoreTimer.resetTimer();
+                    setPathState(10);
+                    isSpecScore = false;
+                }
+
                 break;
             case 10:
-                if (!follower.isBusy()) {
-                    /* Action */
+                if ((rightTouchSensor.isPressed() && leftTouchSensor.isPressed())&& !isSpecScore) {
+//
+                    /* Score Preload */
+                    specScore = true;
+                    isSpecScore = true;
+                    follower.setPose(new Pose(28.5, follower.getPose().getY(), Math.toRadians(175)));
 
-                    /* Path */
+                    telemetry.addData("specScore", specScore);
+
+                    /* Since this is a pathChain, we can have Pedro hold the end point while we are grabbing the sample */
+                } else if ((rightTouchSensor.isPressed() ^ leftTouchSensor.isPressed()) && scoreTimer.getElapsedTimeSeconds() >= 3) {
+                    specScore = true;
+                    isSpecScore = true;
+                    follower.setPose(new Pose(28.5, follower.getPose().getY(), Math.toRadians(175)));
+                }
+
+                if ((specDrive.getCurrentPosition() < 200) && isSpecScore) {
                     follower.followPath(grab5, true);
                     setPathState(11);
+                    isSpecGrabbed = false;
+
                 }
+
                 break;
             case 11:
-                if (!follower.isBusy()) {
-                    /* Action */
+                if ((!follower.isBusy() || ((follower.getPose().getX()-0.1 )< grabPose2.getX())) && !isSpecGrabbed) {
 
-                    /* Path */
-                    follower.followPath(score5, true);
-                    setPathState(12);
+                    specGrabbed = false;
+                    isSpecGrabbed = true;
+                    /* Grab Sample */
+                    /* Since this is a pathChain, we can have Pedro hold the end point while we are scoring the sample */
                 }
+//
+                if ((specServo.getPosition() == RConstants.SPECCLAWCLOSED) && (specDrive.getCurrentPosition() > 200)) {
+                    follower.followPath(score5, 0.9, true);
+                    scoreTimer.resetTimer();
+                    setPathState(12);
+                    isSpecScore = false;
+                }
+
                 break;
             case 12:
-                /* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the scorePose1's position */
-                if (!follower.isBusy()) {
-                    /* Level 1 Ascent */
+                if ((rightTouchSensor.isPressed() && leftTouchSensor.isPressed()) && !isSpecScore) {
+//
+                    /* Score Preload */
+                    specScore = true;
+                    isSpecScore = true;
+                    follower.setPose(new Pose(28.5, follower.getPose().getY(), Math.toRadians(175)));
 
-                    /* Set the state to a Case we won't use or define, so it just stops running an new paths */
+                    telemetry.addData("specScore", specScore);
+
+                    /* Since this is a pathChain, we can have Pedro hold the end point while we are grabbing the sample */
+                } else if ((rightTouchSensor.isPressed() ^ leftTouchSensor.isPressed()) && scoreTimer.getElapsedTimeSeconds() >= 5) {
+                    specScore = true;
+                    isSpecScore = true;
+                    follower.setPose(new Pose(28.5, follower.getPose().getY(), Math.toRadians(175)));
+                }
+
+                if ((specDrive.getCurrentPosition() < 200) && isSpecScore) {
+
                     setPathState(-1);
                 }
+
+
                 break;
         }
     }
@@ -369,7 +470,7 @@ public class iHopeSpecsWorkLol extends OpMode {
                     specTimeStart = System.currentTimeMillis();
                     break;
                 case 2:
-                    if ((System.currentTimeMillis() - specTimeStart) > 1200){
+                    if ((System.currentTimeMillis() - specTimeStart) > 600){
                         specDrive.setTargetPosition(RConstants.SPECARMUP);
                         specDrive.setPower(1);
                         specState = 1;
@@ -380,6 +481,11 @@ public class iHopeSpecsWorkLol extends OpMode {
 
 
 
+    }
+
+    public boolean XBUFFER(Pose robopose, double xbuffer){
+
+        return (Math.abs(robopose.getX() - follower.getPose().getX()) < xbuffer );
     }
 
     /**
@@ -398,6 +504,7 @@ public class iHopeSpecsWorkLol extends OpMode {
     public void loop() {
 
         // These loop the movements of the robot
+
         follower.update();
         autonomousPathUpdate();
         SpecScore();
@@ -410,7 +517,10 @@ public class iHopeSpecsWorkLol extends OpMode {
         telemetry.addData("x", follower.getPose().getX());
         telemetry.addData("y", follower.getPose().getY());
         telemetry.addData("heading", follower.getPose().getHeading());
-        telemetry.addData("score spec boolean", specScore);
+        telemetry.addData("specDrive Position", specDrive.getCurrentPosition());
+        telemetry.addData("Is Pressed", rightTouchSensor.isPressed() || leftTouchSensor.isPressed());
+
+//        telemetry.addData("Intake Position", intakeDrive.getCurrentPosition());
         telemetry.update();
     }
 
@@ -422,25 +532,21 @@ public class iHopeSpecsWorkLol extends OpMode {
         pathTimer = new Timer();
         opmodeTimer = new Timer();
         opmodeTimer.resetTimer();
+        scoreTimer = new Timer();
 
         Constants.setConstants(FConstants.class, LConstants.class);
         follower = new Follower(hardwareMap);
         follower.setStartingPose(startPose);
         buildPaths();
 
-        intakeDrive = hardwareMap.get(DcMotor.class, "intakeDrive");
         specDrive = hardwareMap.get(DcMotor.class, "specDrive");
         specServo = hardwareMap.get(Servo.class, "specServo");
-        intakeDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        intakeDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        specDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightTouchSensor = hardwareMap.get(TouchSensor.class, "rightTouchSensor");
+        leftTouchSensor = hardwareMap.get(TouchSensor.class, "leftTouchSensor");
         specDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        intakeDrive.setTargetPosition(0);
         specDrive.setTargetPosition(200);
-        intakeDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         specDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        intakeDrive.setPower(0.5);
         specDrive.setPower(0.5);
         specServo.setPosition(RConstants.SPECCLAWCLOSED);
 
@@ -461,10 +567,9 @@ public class iHopeSpecsWorkLol extends OpMode {
     public void start() {
         opmodeTimer.resetTimer();
         setPathState(0);
-        intakeDrive.setTargetPosition(10);
-
-
     }
+
+
 
     /**
      * We do not use this because everything should automatically disable

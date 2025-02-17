@@ -32,12 +32,20 @@ package pedroPathing.TeleOp;
 import android.app.Activity;
 import android.graphics.Color;
 import android.view.View;
+import com.pedropathing.follower.Follower;
+import com.pedropathing.localization.Pose;
+import com.pedropathing.pathgen.BezierCurve;
+import com.pedropathing.pathgen.BezierLine;
+import com.pedropathing.pathgen.PathChain;
+import com.pedropathing.pathgen.Point;
+import com.pedropathing.util.Timer;
+import pedroPathing.constants.FConstants;
+import pedroPathing.constants.LConstants;
+import pedroPathing.constants.RConstants;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
-import com.pedropathing.follower.Follower;
-import com.pedropathing.localization.Pose;
 import com.pedropathing.util.Constants;
 import pedroPathing.constants.FConstants;
 import pedroPathing.constants.LConstants;
@@ -117,7 +125,9 @@ public class mainTeleOpReal extends LinearOpMode {
 	public static double ki = 0.0;
 	public static double kd = 0.0;
 	private Follower follower;
-	private final Pose startPose = new Pose(0,0,0);
+	private Timer pathTimer, actionTimer, opmodeTimer;
+	private final Pose robotPose = new Pose(0,0,0);
+
 
 
 	PIDController pid = new PIDController(kp, kd, ki);
@@ -127,7 +137,7 @@ public class mainTeleOpReal extends LinearOpMode {
 
 		Constants.setConstants(FConstants.class,LConstants.class);
 		follower = new Follower(hardwareMap);
-		follower.setStartingPose(startPose);
+		follower.setStartingPose(robotPose);
 
 		dashboard = FtcDashboard.getInstance();
 		telemetry.addData("Status", "Initialized");
@@ -179,7 +189,7 @@ public class mainTeleOpReal extends LinearOpMode {
 
 		armServo.setPosition(0.475);
 		wristServo.setPosition(wristPositionDown);
-        
+
 
 
 		// Wait for the game to start (driver presses START)
@@ -201,7 +211,7 @@ public class mainTeleOpReal extends LinearOpMode {
 			int state = 0;
 
 			while (opModeIsActive()) {
-				follower.setTeleOpMovementVectors(-gamepad2.left_stick_y, -gamepad2.left_stick_x, -gamepad2.right_stick_x * 0.65, true);
+				follower.setTeleOpMovementVectors(-gamepad2.left_stick_y, -gamepad2.left_stick_x, (-gamepad2.right_stick_x * 0.65), true);
 				follower.update();
 
 //				drive.setDrivePowers(new PoseVelocity2d(
@@ -353,7 +363,7 @@ public class mainTeleOpReal extends LinearOpMode {
 	public void SpecScore() {
 		if (specScore) {
 			specDrive.setTargetPosition(0);
-			specDrive.setPower(0.4);
+			specDrive.setPower(0.8);
 		}
 
 		if ((specDrive.getTargetPosition() == 0) && specDrive.getCurrentPosition() < 250) {
