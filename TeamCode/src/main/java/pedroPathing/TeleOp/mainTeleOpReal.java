@@ -329,7 +329,11 @@ public class mainTeleOpReal extends LinearOpMode {
 								)
 						)
 				);
+			} else {
+				follower.setTeleOpMovementVectors(-gamepad2.left_stick_y, -gamepad2.left_stick_x, (-gamepad2.right_stick_x * 0.65), true);
+				follower.update();
 			}
+
 
 			if (rightTouchSensor.isPressed() && leftTouchSensor.isPressed()){
 				follower.setPose(new Pose(28.5, follower.getPose().getY(), Math.toRadians(180)));
