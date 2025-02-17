@@ -38,6 +38,7 @@ public class iHopeSpecsWorkLol extends OpMode {
 	private Servo specServo = null;
 	TouchSensor rightTouchSensor;
 	TouchSensor leftTouchSensor;
+	private DcMotor intakeDrive;
 
 	/**
 	 * This is the variable where we store the state of our auto.
@@ -540,12 +541,15 @@ public class iHopeSpecsWorkLol extends OpMode {
 		specServo = hardwareMap.get(Servo.class, "specServo");
 		rightTouchSensor = hardwareMap.get(TouchSensor.class, "rightTouchSensor");
 		leftTouchSensor = hardwareMap.get(TouchSensor.class, "leftTouchSensor");
+		intakeDrive = hardwareMap.get(DcMotor.class, "intakeDrive");
 		specDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
 		specDrive.setTargetPosition(200);
 		specDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 		specDrive.setPower(0.5);
 		specServo.setPosition(RConstants.SPECCLAWCLOSED);
+		intakeDrive.setTargetPosition(0);
+		intakeDrive.setPower(0.1);
 
 	}
 
