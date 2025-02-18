@@ -285,7 +285,7 @@ public class iHopeSpecsWorkLol extends OpMode {
 				}
 //
 				if ((specServo.getPosition() == RConstants.SPECCLAWCLOSED) && (specDrive.getCurrentPosition() > 200)) {
-					follower.followPath(score2, 0.9, true);
+					follower.followPath(score2, true);
 					scoreTimer.resetTimer();
 					setPathState(3);
 					isSpecScore = false;
@@ -302,7 +302,7 @@ public class iHopeSpecsWorkLol extends OpMode {
 					telemetry.addData("specScore", specScore);
 
 					/* Since this is a pathChain, we can have Pedro hold the end point while we are grabbing the sample */
-				} else if ((rightTouchSensor.isPressed() ^ leftTouchSensor.isPressed()) && scoreTimer.getElapsedTimeSeconds() >= 3) {
+				} else if ((rightTouchSensor.isPressed() ^ leftTouchSensor.isPressed()) && scoreTimer.getElapsedTimeSeconds() >= 2.5) {
 					specScore = true;
 					isSpecScore = true;
 					follower.setPose(new Pose(28.5, follower.getPose().getY(), Math.toRadians(175)));
@@ -326,7 +326,7 @@ public class iHopeSpecsWorkLol extends OpMode {
 				}
 //
 				if ((specServo.getPosition() == RConstants.SPECCLAWCLOSED) && (specDrive.getCurrentPosition() > 200)) {
-					follower.followPath(score3, 0.9, true);
+					follower.followPath(score3,0.9, true);
 					scoreTimer.resetTimer();
 					setPathState(8);
 					isSpecScore = false;
@@ -345,7 +345,7 @@ public class iHopeSpecsWorkLol extends OpMode {
 					telemetry.addData("specScore", specScore);
 
 					/* Since this is a pathChain, we can have Pedro hold the end point while we are grabbing the sample */
-				} else if ((rightTouchSensor.isPressed() ^ leftTouchSensor.isPressed()) && scoreTimer.getElapsedTimeSeconds() >= 3) {
+				} else if ((rightTouchSensor.isPressed() ^ leftTouchSensor.isPressed()) && scoreTimer.getElapsedTimeSeconds() >= 2.5) {
 					specScore = true;
 					isSpecScore = true;
 					follower.setPose(new Pose(28.5, follower.getPose().getY(), Math.toRadians(175)));
@@ -386,7 +386,7 @@ public class iHopeSpecsWorkLol extends OpMode {
 					telemetry.addData("specScore", specScore);
 
 					/* Since this is a pathChain, we can have Pedro hold the end point while we are grabbing the sample */
-				} else if ((rightTouchSensor.isPressed() ^ leftTouchSensor.isPressed()) && scoreTimer.getElapsedTimeSeconds() >= 3) {
+				} else if ((rightTouchSensor.isPressed() ^ leftTouchSensor.isPressed()) && scoreTimer.getElapsedTimeSeconds() >= 2.5) {
 					specScore = true;
 					isSpecScore = true;
 					follower.setPose(new Pose(28.5, follower.getPose().getY(), Math.toRadians(175)));
@@ -428,7 +428,7 @@ public class iHopeSpecsWorkLol extends OpMode {
 					telemetry.addData("specScore", specScore);
 
 					/* Since this is a pathChain, we can have Pedro hold the end point while we are grabbing the sample */
-				} else if ((rightTouchSensor.isPressed() ^ leftTouchSensor.isPressed()) && scoreTimer.getElapsedTimeSeconds() >= 5) {
+				} else if ((rightTouchSensor.isPressed() ^ leftTouchSensor.isPressed()) && scoreTimer.getElapsedTimeSeconds() >= 2.5) {
 					specScore = true;
 					isSpecScore = true;
 					follower.setPose(new Pose(28.5, follower.getPose().getY(), Math.toRadians(175)));
@@ -516,7 +516,13 @@ public class iHopeSpecsWorkLol extends OpMode {
 		telemetry.addData("y", follower.getPose().getY());
 		telemetry.addData("heading", follower.getPose().getHeading());
 		telemetry.addData("specDrive Position", specDrive.getCurrentPosition());
-		telemetry.addData("Is Pressed", rightTouchSensor.isPressed() || leftTouchSensor.isPressed());
+		telemetry.addData("intakeDrive Position", intakeDrive.getCurrentPosition());
+		telemetry.addData("Right Sensor Is Pressed", rightTouchSensor.isPressed());
+		telemetry.addData("Left Sensor Is Pressed", leftTouchSensor.isPressed());
+
+		if (intakeDrive.getCurrentPosition()>7) {
+			intakeDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+		}
 
 //        telemetry.addData("Intake Position", intakeDrive.getCurrentPosition());
 		telemetry.update();
@@ -542,14 +548,17 @@ public class iHopeSpecsWorkLol extends OpMode {
 		rightTouchSensor = hardwareMap.get(TouchSensor.class, "rightTouchSensor");
 		leftTouchSensor = hardwareMap.get(TouchSensor.class, "leftTouchSensor");
 		intakeDrive = hardwareMap.get(DcMotor.class, "intakeDrive");
+		intakeDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 		specDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+		intakeDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
 		specDrive.setTargetPosition(200);
 		specDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+		intakeDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 		specDrive.setPower(0.5);
 		specServo.setPosition(RConstants.SPECCLAWCLOSED);
 		intakeDrive.setTargetPosition(0);
-		intakeDrive.setPower(0.1);
+		intakeDrive.setPower(0.2);
 
 	}
 
@@ -568,6 +577,7 @@ public class iHopeSpecsWorkLol extends OpMode {
 	public void start() {
 		opmodeTimer.resetTimer();
 		setPathState(0);
+		intakeDrive.setTargetPosition(0);
 	}
 
 

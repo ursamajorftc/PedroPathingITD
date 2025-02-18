@@ -18,7 +18,7 @@ public class RConstants {
 
 	//claw positions
 	public static final double CLAWPOSITIONOPEN = 0.26;
-	public static final double CLAWPOSITIONCLOSED = 0.46;
+	public static final double CLAWPOSITIONCLOSED = 0.45;
 
 	//spec Claw positions
 	public static final double SPECCLAWOPEN = 0.3;

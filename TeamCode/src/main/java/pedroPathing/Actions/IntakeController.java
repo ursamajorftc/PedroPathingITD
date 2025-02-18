@@ -29,7 +29,7 @@ public class IntakeController {
 			intakeTargetPosition = MAX_POSITION;
 		}
 		if (gamepad1.y){
-			intakeTargetPosition = 0;
+			intakeTargetPosition = 10;
 		}
 		intakeDrive.setTargetPosition(intakeTargetPosition);
 		intakeDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
