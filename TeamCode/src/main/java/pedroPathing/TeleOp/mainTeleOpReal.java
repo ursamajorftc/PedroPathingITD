@@ -36,8 +36,6 @@ import android.view.View;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.localization.Pose;
 import com.pedropathing.pathgen.BezierCurve;
-import com.pedropathing.pathgen.BezierLine;
-import com.pedropathing.pathgen.Path;
 import com.pedropathing.pathgen.PathBuilder;
 import com.pedropathing.pathgen.PathChain;
 import com.pedropathing.pathgen.Point;
@@ -51,9 +49,6 @@ import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.pedropathing.util.Constants;
-
-import pedroPathing.constants.FConstants;
-import pedroPathing.constants.LConstants;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -70,7 +65,6 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
-import pedroPathing.Actions.IntakeController;
 import pedroPathing.pid.PIDController;
 
 @Config
@@ -101,6 +95,7 @@ public class mainTeleOpReal extends LinearOpMode {
     TouchSensor leftTouchSensor;
     View relativeLayout;
     PIDController verticalSlidePid = new PIDController(0.01, 0, 0);
+    PIDController intakeSlidePid = new PIDController(0.01, 0, 0);
     //endregion
 
     //region Variables
@@ -139,8 +134,9 @@ public class mainTeleOpReal extends LinearOpMode {
 
     private final Pose robotPose = new Pose(29, 67, Math.toRadians(180));
     private double scorePosition = 65;
-    private boolean follow = true;
+    private boolean intakeRetract = false;
     private boolean specMode = false;
+    int intakeTargetPosition = 0;
     //endregion
 
 
@@ -171,6 +167,7 @@ public class mainTeleOpReal extends LinearOpMode {
         intakeDrive = hardwareMap.get(DcMotor.class, "intakeDrive");
         intakeDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         intakeDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        intakeDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         clawServo = hardwareMap.get(Servo.class, "clawServo");
         wristServo = hardwareMap.get(Servo.class, "wristServo");
@@ -208,7 +205,7 @@ public class mainTeleOpReal extends LinearOpMode {
         // Wait for the game to start (driver presses START)
         waitForStart();
 
-        IntakeController intakeController = new IntakeController(gamepad1, intakeDrive);
+//        IntakeController intakeController = new IntakeController(gamepad1, intakeDrive);
         runtime.reset();
 
         armServo.setPosition(0.475);
@@ -219,6 +216,7 @@ public class mainTeleOpReal extends LinearOpMode {
         opmodeTimer = new Timer();
         opmodeTimer.resetTimer();
         scoreTimer = new Timer();
+        intakeTimer = new Timer();
 
 
 
@@ -231,7 +229,7 @@ public class mainTeleOpReal extends LinearOpMode {
             NormalizedRGBA colors = colorSensor.getNormalizedColors();
             NormalizedRGBA colors1 = sampleDistance.getNormalizedColors();
 
-            intakeController.run();
+//            intakeController.run();
 
             // Update the hsvValues array by passing it to Color.colorToHSV()
             Color.colorToHSV(colors.toColor(), hsvValues);
@@ -239,6 +237,8 @@ public class mainTeleOpReal extends LinearOpMode {
 
 
             // Setup a variable for each drive wheel to save power level for telemetry
+            
+
 
             if (gamepad2.a) {
                 specServo.setPosition(0.55);
@@ -254,7 +254,15 @@ public class mainTeleOpReal extends LinearOpMode {
             if (gamepad1.x) {
                 intakeCRSLeft.setPower(1);
                 intakeCRSRight.setPower(-1);
+            }else {
+                intakeCRSLeft.setPower(-1);
+                intakeCRSRight.setPower(1);
             }
+
+            if (gamepad1.y){
+                intakeRetract = true;
+                if (intakeRetract) intakeDrive.setPower(-0.6);
+            } else intakeRetract = false;
             if (gamepad1.b) {
                 intakeCRSLeft.setPower(0);
                 intakeCRSRight.setPower(0);
@@ -328,16 +336,25 @@ public class mainTeleOpReal extends LinearOpMode {
             if (gamepad2.left_bumper && !previousBumberState) {
                 lockServo.setPosition(0);
                 specMode = !specMode;
-                previousBumberState = true;
             }
 
-            previousBumberState = false;
+            previousBumberState = gamepad2.left_bumper;
 
-
+            double joystickInput = (gamepad1.left_stick_y)*-0.8;
+            if (!intakeRetract) {
+                if (-20 < intakeDrive.getCurrentPosition() && intakeDrive.getCurrentPosition() <= 870) {
+                    intakeDrive.setPower(joystickInput);
+                } else if (intakeDrive.getCurrentPosition() > 865) {
+                    intakeDrive.setPower(-0.6);
+                } else {
+                    intakeDrive.setPower(0.6);
+                }
+            }
 
             if (gamepad2.x) {
                 follower.setPose(grabPose);
                 setPathState(1);
+                isSpecGrabbed = false;
             }
 
             if (rightTouchSensor.isPressed() && leftTouchSensor.isPressed()) {
@@ -362,6 +379,12 @@ public class mainTeleOpReal extends LinearOpMode {
 
             }
 
+            if (specMode) {
+                telemetry.addLine("<font color='blue'>Special Mode Active</font>");
+            } else {
+                telemetry.addLine("<font color='white'>Normal Mode</font>");
+            }
+
             //region Telemetry
             TelemetryPacket packet = new TelemetryPacket();
 
@@ -369,27 +392,21 @@ public class mainTeleOpReal extends LinearOpMode {
             packet.put("IntakeServoPosition", intakeServoPosition);
             packet.put("IntakePosition", intakeDrive.getCurrentPosition());
             packet.put("HSV Value", color);
-            packet.put("Distance", ((DistanceSensor) sampleDistance).getDistance(DistanceUnit.MM));
             packet.put("Deposit Slides", outmoto1.getCurrentPosition());
             double batteryVoltage = voltageSensor.getVoltage();
             packet.put("Battery Voltage", batteryVoltage);
-            packet.put("Deposit position", outmoto1.getCurrentPosition());
             packet.put("Target Position", highBasket);
             dashboard.sendTelemetryPacket(packet);
 
             telemetry.addData("Battery Voltage", batteryVoltage);
             telemetry.update();
             telemetry.addData("Status", "Run Time: " + runtime.toString());
-            telemetry.addData("IntakeServoPosition", intakeServoPosition);
             telemetry.addData("IntakePosition", intakeDrive.getCurrentPosition());
             telemetry.addData("hsv Value:", color);
-            telemetry.addData("Distance", ((DistanceSensor) sampleDistance).getDistance(DistanceUnit.MM));
             telemetry.addData("Deposit Slides", outmoto1.getCurrentPosition());
             telemetry.addData("Deposit Target Position", verticalSlidePid.getTargetPosition());
-            telemetry.addData("X", follower.getPose().getX());
-            telemetry.addData("Y", follower.getPose().getY());
-            telemetry.addData("Heading in Degrees", Math.toDegrees(follower.getPose().getHeading()));
             telemetry.addData("specDrive position", specDrive.getCurrentPosition());
+            telemetry.addData("spec Mode", specMode);
             telemetry.update();
             //endregion
         }
@@ -470,7 +487,7 @@ public class mainTeleOpReal extends LinearOpMode {
     }
 
     public void updateArmTransfer() {
-        if ((!sampleDistanceTriggered && ((DistanceSensor) sampleDistance).getDistance(DistanceUnit.MM) < 8)) {
+        if ((!sampleDistanceTriggered && ((DistanceSensor) sampleDistance).getDistance(DistanceUnit.MM) < 12)) {
             sampleDistanceTriggered = true;
             startTime = System.currentTimeMillis();
             state = 1; // Start the state machine
@@ -593,7 +610,7 @@ public class mainTeleOpReal extends LinearOpMode {
     }
 
     private int pathState;
-    private Timer pathTimer, opmodeTimer, scoreTimer;
+    private Timer pathTimer, opmodeTimer, scoreTimer, intakeTimer;
 
 
     private final Pose grabPose = new Pose(7.7, 36, Math.toRadians(180));
@@ -636,7 +653,7 @@ public class mainTeleOpReal extends LinearOpMode {
     public void specScoreUpdate() {
         switch (pathState){
             case 1:
-                if ((!follower.isBusy() || (follower.getPose().getX() < grabPose.getX())) && !isSpecGrabbed) {
+                if ((!follower.isBusy() || (follower.getPose().getX() + 0.1 <= grabPose.getX())) && !isSpecGrabbed) {
                     telemetry.addData("it is running", true);
                     telemetry.update();
 

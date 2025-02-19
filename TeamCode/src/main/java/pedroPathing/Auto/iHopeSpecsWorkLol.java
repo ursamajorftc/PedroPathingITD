@@ -53,14 +53,14 @@ public class iHopeSpecsWorkLol extends OpMode {
 	private final Pose startPush1 = new Pose(38, 47, Math.toRadians(180));
 	private final Pose endPush1 = new Pose(22, 42, Math.toRadians(180));
 	private final Pose endPush2 = new Pose(22, 32, Math.toRadians(180));
-	private final Pose startPush3 = new Pose(58, 30, Math.toRadians(180));
-	private final Pose endPush3 = new Pose(23.5, 27.5, Math.toRadians(180));
+	private final Pose startPush3 = new Pose(58, 32, Math.toRadians(180));
+	private final Pose endPush3 = new Pose(23.5, 28.5, Math.toRadians(180));
 
 	//grab specs
-	private final Pose grabPose2 = new Pose(9.5, 37, Math.toRadians(185));
-	private final Pose grabPose3 = new Pose(7.7, 36, Math.toRadians(180));
-	private final Pose grabPose4 = new Pose(7.7, 36, Math.toRadians(180));
-	private final Pose grabPose5 = new Pose(7.7, 36, Math.toRadians(180));
+	private final Pose grabPose2 = new Pose(9.8, 37, Math.toRadians(185));
+	private final Pose grabPose3 = new Pose(7.6, 36, Math.toRadians(180));
+	private final Pose grabPose4 = new Pose(7.6, 36, Math.toRadians(180));
+	private final Pose grabPose5 = new Pose(7.6, 36, Math.toRadians(180));
 
 	//score specs
 	private final Pose scorePose1 = new Pose(29.5, 70.5, Math.toRadians(180));
@@ -68,7 +68,7 @@ public class iHopeSpecsWorkLol extends OpMode {
 	private final Pose scorePose3 = new Pose(29, 68, Math.toRadians(180));
 	private final Pose scorePose4 = new Pose(29, 67.5, Math.toRadians(180));
 	private final Pose scorePose5 = new Pose(29, 67, Math.toRadians(180));
-	private final Pose scoreControl = new Pose(25.5, 70);
+	private final Pose scoreControl = new Pose(20, 70);
 
 
 	/* These are our Paths and PathChains that we will define in buildPaths() */
@@ -520,9 +520,9 @@ public class iHopeSpecsWorkLol extends OpMode {
 		telemetry.addData("Right Sensor Is Pressed", rightTouchSensor.isPressed());
 		telemetry.addData("Left Sensor Is Pressed", leftTouchSensor.isPressed());
 
-		if (intakeDrive.getCurrentPosition()>7) {
-			intakeDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-		}
+//		if (intakeDrive.getCurrentPosition()>7) {
+//			intakeDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//		}
 
 //        telemetry.addData("Intake Position", intakeDrive.getCurrentPosition());
 		telemetry.update();
@@ -554,11 +554,10 @@ public class iHopeSpecsWorkLol extends OpMode {
 
 		specDrive.setTargetPosition(200);
 		specDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-		intakeDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 		specDrive.setPower(0.5);
 		specServo.setPosition(RConstants.SPECCLAWCLOSED);
-		intakeDrive.setTargetPosition(0);
-		intakeDrive.setPower(0.2);
+		intakeDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+		intakeDrive.setPower(0);
 
 	}
 

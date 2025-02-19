@@ -17,7 +17,7 @@ public class IntakeController {
 	}
 
 	public void run() {
-		double joystickInput = -gamepad1.left_stick_y * Math.abs(gamepad1.left_stick_y) ;
+		double joystickInput = -gamepad1.left_stick_y * Math.abs(gamepad1.left_stick_y);
 		int intakePosition = intakeDrive.getCurrentPosition();
 		
 
