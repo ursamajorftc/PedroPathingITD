@@ -26,7 +26,7 @@ public class RConstants {
 
 	// spec Arm positions
 
-	public static final int  SPECARMUP = 470;
+	public static final int  SPECARMUP = 490;
 	public static final int SPECARMDOWN = 0;
 
 

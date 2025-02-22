@@ -199,7 +199,8 @@ public class mainTeleOpReal extends LinearOpMode {
         wristServo.setPosition(wristPositionDown);
 
         intakeDrive.setPower(-0.2);
-        specDrive.setPower(-0.15);
+        specDrive.setPower(-0.4);
+        specServo.setPosition(RConstants.SPECCLAWOPEN);
         //endregion
 
         // Wait for the game to start (driver presses START)
@@ -252,7 +253,7 @@ public class mainTeleOpReal extends LinearOpMode {
             if (gamepad2.a) {
                 specServo.setPosition(0.55);
                 sleep(400);
-                specDrive.setTargetPosition(470);
+                specDrive.setTargetPosition(490);
                 specDrive.setPower(1);
             }
             if (gamepad2.b) {
@@ -304,7 +305,7 @@ public class mainTeleOpReal extends LinearOpMode {
 
             updateArmTransfer();
             updateArmRetracty();
-            peckArm();
+//            peckArm();
 
 
             if (gamepad1.a) {
@@ -438,7 +439,7 @@ public class mainTeleOpReal extends LinearOpMode {
             specDrive.setPower(0.8);
         }
 
-        if ((specDrive.getTargetPosition() == 0) && specDrive.getCurrentPosition() < 250) {
+        if ((specDrive.getTargetPosition() == 0) && specDrive.getCurrentPosition() < 320) {
             specServo.setPosition(0.3);
             specScore = false;
         }
@@ -473,36 +474,36 @@ public class mainTeleOpReal extends LinearOpMode {
     public static PathBuilder builder = new PathBuilder();
 
 
-    public void peckArm() {
-        if (gamepad2.right_bumper) {
-            peckState = 1;
-            peckTime = System.currentTimeMillis();
-        }
-
-        switch (peckState) {
-            case 1:
-                armServo.setPosition(armPositionGrab);
-                wristServo.setPosition(wristPositionDown);
-                peckState = 2;
-                break;
-
-            case 2:
-                if (System.currentTimeMillis() - peckTime > 100) {
-                    clawServo.setPosition(RConstants.CLAWPOSITIONCLOSED);
-                    peckTime = System.currentTimeMillis();
-                    peckState = 2;
-                }
-
-            case 3:
-                if (System.currentTimeMillis() - peckTime > 250) {
-                    armServo.setPosition(armPositionHover);
-                    wristServo.setPosition(wristPositionDown);
-                    clawServo.setPosition(RConstants.CLAWPOSITIONOPEN);
-
-                    peckState = 0;
-                }
-        }
-    }
+//    public void peckArm() {
+//        if (gamepad2.right_bumper) {
+//            peckState = 1;
+//            peckTime = System.currentTimeMillis();
+//        }
+//
+//        switch (peckState) {
+//            case 1:
+//                armServo.setPosition(armPositionGrab);
+//                wristServo.setPosition(wristPositionDown);
+//                peckState = 2;
+//                break;
+//
+//            case 2:
+//                if (System.currentTimeMillis() - peckTime > 100) {
+//                    clawServo.setPosition(RConstants.CLAWPOSITIONCLOSED);
+//                    peckTime = System.currentTimeMillis();
+//                    peckState = 2;
+//                }
+//
+//            case 3:
+//                if (System.currentTimeMillis() - peckTime > 250) {
+//                    armServo.setPosition(armPositionHover);
+//                    wristServo.setPosition(wristPositionDown);
+//                    clawServo.setPosition(RConstants.CLAWPOSITIONOPEN);
+//
+//                    peckState = 0;
+//                }
+//        }
+//    }
 
     public void updateArmTransfer() {
         if ((!sampleDistanceTriggered && ((DistanceSensor) sampleDistance).getDistance(DistanceUnit.MM) < 12)) {
@@ -681,7 +682,7 @@ public class mainTeleOpReal extends LinearOpMode {
                     /* Since this is a pathChain, we can have Pedro hold the end point while we are scoring the sample */
                 }
 //
-                if ((specServo.getPosition() == RConstants.SPECCLAWCLOSED) && (specDrive.getCurrentPosition() > 200)) {
+                if ((specServo.getPosition() == RConstants.SPECCLAWCLOSED) && (specDrive.getCurrentPosition() > 290)) {
                     follower.followPath(score,0.9, true);
                     scoreTimer.resetTimer();
                     setPathState(2);
@@ -707,7 +708,7 @@ public class mainTeleOpReal extends LinearOpMode {
                     follower.setPose(new Pose(28.5, follower.getPose().getY(), Math.toRadians(175)));
                 }
 
-                if ((specDrive.getCurrentPosition() < 200) && isSpecScore) {
+                if ((specDrive.getCurrentPosition() < 290) && isSpecScore) {
                     follower.followPath(grab, true);
                     setPathState(1);
                     isSpecGrabbed = false;

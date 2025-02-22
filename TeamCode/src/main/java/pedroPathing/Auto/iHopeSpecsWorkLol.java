@@ -13,6 +13,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.TouchSensor;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import pedroPathing.constants.FConstants;
 import pedroPathing.constants.LConstants;
@@ -58,17 +59,17 @@ public class iHopeSpecsWorkLol extends OpMode {
 
 	//grab specs
 	private final Pose grabPose2 = new Pose(9.8, 37, Math.toRadians(185));
-	private final Pose grabPose3 = new Pose(7.0, 36, Math.toRadians(180));
-	private final Pose grabPose4 = new Pose(6.6, 36, Math.toRadians(180));
-	private final Pose grabPose5 = new Pose(5.3, 36, Math.toRadians(180));
+	private final Pose grabPose3 = new Pose(6.1, 36, Math.toRadians(180));
+	private final Pose grabPose4 = new Pose(6.1, 36, Math.toRadians(180));
+	private final Pose grabPose5 = new Pose(5, 36, Math.toRadians(180));
 
 	//score specs
-	private final Pose scorePose1 = new Pose(29.5, 71, Math.toRadians(180));
-	private final Pose scorePose2 = new Pose(29, 70, Math.toRadians(180));
-	private final Pose scorePose3 = new Pose(29, 69, Math.toRadians(180));
-	private final Pose scorePose4 = new Pose(29, 68, Math.toRadians(180));
-	private final Pose scorePose5 = new Pose(29, 67, Math.toRadians(180));
-	private final Pose scoreControl = new Pose(20, 70);
+	private final Pose scorePose1 = new Pose(29.5, 72, Math.toRadians(180));
+	private final Pose scorePose2 = new Pose(29.5, 70, Math.toRadians(180));
+	private final Pose scorePose3 = new Pose(29.5, 68.5, Math.toRadians(180));
+	private final Pose scorePose4 = new Pose(29.5, 67, Math.toRadians(180));
+	private final Pose scorePose5 = new Pose(29.5, 66, Math.toRadians(180));
+	private final Pose scoreControl = new Pose(22, 70);
 
 
 	/* These are our Paths and PathChains that we will define in buildPaths() */
@@ -263,12 +264,13 @@ public class iHopeSpecsWorkLol extends OpMode {
                 - Robot Position: "if(follower.getPose().getX() > 36) {}"
                 */
 
-				/* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the scorePose1's position */
+				/* This case checks the robot's position and will wait until the robot position  is close (1 inch away) from the scorePose1's position */
 				if ((rightTouchSensor.isPressed() && leftTouchSensor.isPressed() || !follower.isBusy()) && !isSpecScore) {
 //
 					/* Score Preload */
 					specScore = true;
 					isSpecScore = true;
+
 
 					/* Since this is a pathChain, we can have Pedro hold the end point while we are grabbing the sample */
 				}
@@ -289,7 +291,7 @@ public class iHopeSpecsWorkLol extends OpMode {
 				}
 //
 				if ((specServo.getPosition() == RConstants.SPECCLAWCLOSED) && (specDrive.getCurrentPosition() > 200)) {
-					follower.followPath(score2, 0.9, true);
+					follower.followPath(score2, 1, true);
 					scoreTimer.resetTimer();
 					setPathState(3);
 					isSpecScore = false;
@@ -312,6 +314,12 @@ public class iHopeSpecsWorkLol extends OpMode {
 					follower.setPose(new Pose(28.5, follower.getPose().getY(), Math.toRadians(175)));
 				}
 
+//				else if (scoreTimer.getElapsedTimeSeconds() > 3){
+//					specScore = true;
+//					isSpecScore = true;
+//					follower.setPose(new Pose(28.5, follower.getPose().getY(), Math.toRadians(175)));
+//				}
+
 				if ((specDrive.getCurrentPosition() < 200) && isSpecScore) {
 					follower.followPath(grab3, true);
 					setPathState(7);
@@ -330,7 +338,7 @@ public class iHopeSpecsWorkLol extends OpMode {
 				}
 //
 				if ((specServo.getPosition() == RConstants.SPECCLAWCLOSED) && (specDrive.getCurrentPosition() > 200)) {
-					follower.followPath(score3,0.82, true);
+					follower.followPath(score3,1, true);
 					scoreTimer.resetTimer();
 					setPathState(8);
 					isSpecScore = false;
@@ -354,6 +362,11 @@ public class iHopeSpecsWorkLol extends OpMode {
 					isSpecScore = true;
 					follower.setPose(new Pose(28.5, follower.getPose().getY(), Math.toRadians(175)));
 				}
+//				else if (scoreTimer.getElapsedTimeSeconds() > 3){
+//					specScore = true;
+//					isSpecScore = true;
+//					follower.setPose(new Pose(28.5, follower.getPose().getY(), Math.toRadians(175)));
+//				}
 
 				if ((specDrive.getCurrentPosition() < 200) && isSpecScore) {
 					follower.followPath(grab4, true);
@@ -372,7 +385,7 @@ public class iHopeSpecsWorkLol extends OpMode {
 				}
 //
 				if ((specServo.getPosition() == RConstants.SPECCLAWCLOSED) && (specDrive.getCurrentPosition() > 200)) {
-					follower.followPath(score4, 0.82, true);
+					follower.followPath(score4, 1, true);
 					scoreTimer.resetTimer();
 					setPathState(10);
 					isSpecScore = false;
@@ -395,6 +408,11 @@ public class iHopeSpecsWorkLol extends OpMode {
 					isSpecScore = true;
 					follower.setPose(new Pose(28.5, follower.getPose().getY(), Math.toRadians(175)));
 				}
+//				else if (scoreTimer.getElapsedTimeSeconds() > 3){
+//					specScore = true;
+//					isSpecScore = true;
+//					follower.setPose(new Pose(28.5, follower.getPose().getY(), Math.toRadians(175)));
+//				}
 
 				if ((specDrive.getCurrentPosition() < 200) && isSpecScore) {
 					follower.followPath(grab5, true);
@@ -414,7 +432,7 @@ public class iHopeSpecsWorkLol extends OpMode {
 				}
 //
 				if ((specServo.getPosition() == RConstants.SPECCLAWCLOSED) && (specDrive.getCurrentPosition() > 200)) {
-					follower.followPath(score5, 0.82, true);
+					follower.followPath(score5, 1, true);
 					scoreTimer.resetTimer();
 					setPathState(12);
 					isSpecScore = false;
@@ -437,6 +455,11 @@ public class iHopeSpecsWorkLol extends OpMode {
 					isSpecScore = true;
 					follower.setPose(new Pose(28.5, follower.getPose().getY(), Math.toRadians(175)));
 				}
+//				else if (scoreTimer.getElapsedTimeSeconds() > 3){
+//					specScore = true;
+//					isSpecScore = true;
+//					follower.setPose(new Pose(28.5, follower.getPose().getY(), Math.toRadians(175)));
+//				}
 
 				if ((specDrive.getCurrentPosition() < 200) && isSpecScore) {
 
@@ -459,7 +482,7 @@ public class iHopeSpecsWorkLol extends OpMode {
 			specDrive.setPower(0.7);
 		}
 
-		if (specScore && (specDrive.getTargetPosition() == 0) && specDrive.getCurrentPosition() < 280) {
+		if (specScore && (specDrive.getTargetPosition() == 0) && specDrive.getCurrentPosition() < 320) {
 			specServo.setPosition(0.3);
 			specScore = false;
 		}
@@ -562,6 +585,13 @@ public class iHopeSpecsWorkLol extends OpMode {
 		specServo.setPosition(RConstants.SPECCLAWCLOSED);
 		intakeDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 		intakeDrive.setPower(0);
+
+
+		if (opmodeTimer.getElapsedTimeSeconds() > 29.5) {
+			specScore = true;
+			isSpecScore = true;
+			follower.setPose(new Pose(28.5, follower.getPose().getY(), Math.toRadians(175)));
+		}
 
 	}
 
