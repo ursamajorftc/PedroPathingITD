@@ -206,7 +206,7 @@ public class mainTeleOpReal extends LinearOpMode {
         waitForStart();
 
         intakeDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-
+        specDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         intakeDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
 //        specDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -488,8 +488,17 @@ public class mainTeleOpReal extends LinearOpMode {
 
             case 2:
                 if (System.currentTimeMillis() - peckTime > 100) {
+                    clawServo.setPosition(RConstants.CLAWPOSITIONCLOSED);
+                    peckTime = System.currentTimeMillis();
+                    peckState = 2;
+                }
+
+            case 3:
+                if (System.currentTimeMillis() - peckTime > 250) {
                     armServo.setPosition(armPositionHover);
                     wristServo.setPosition(wristPositionDown);
+                    clawServo.setPosition(RConstants.CLAWPOSITIONOPEN);
+
                     peckState = 0;
                 }
         }

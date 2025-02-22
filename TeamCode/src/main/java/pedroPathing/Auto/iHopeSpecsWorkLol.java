@@ -52,21 +52,21 @@ public class iHopeSpecsWorkLol extends OpMode {
 	//push samples
 	private final Pose startPush1 = new Pose(38, 47, Math.toRadians(180));
 	private final Pose endPush1 = new Pose(22, 42, Math.toRadians(180));
-	private final Pose endPush2 = new Pose(22, 32, Math.toRadians(180));
+	private final Pose endPush2 = new Pose(22, 32, Math.toRadians(185));
 	private final Pose startPush3 = new Pose(58, 32, Math.toRadians(185));
-	private final Pose endPush3 = new Pose(23.5, 28.5, Math.toRadians(185));
+	private final Pose endPush3 = new Pose(23.5, 28, Math.toRadians(185));
 
 	//grab specs
 	private final Pose grabPose2 = new Pose(9.8, 37, Math.toRadians(185));
-	private final Pose grabPose3 = new Pose(7.2, 36, Math.toRadians(180));
-	private final Pose grabPose4 = new Pose(7.2, 36, Math.toRadians(180));
-	private final Pose grabPose5 = new Pose(7.2, 36, Math.toRadians(180));
+	private final Pose grabPose3 = new Pose(7.0, 36, Math.toRadians(180));
+	private final Pose grabPose4 = new Pose(6.6, 36, Math.toRadians(180));
+	private final Pose grabPose5 = new Pose(5.3, 36, Math.toRadians(180));
 
 	//score specs
-	private final Pose scorePose1 = new Pose(29.5, 70.5, Math.toRadians(180));
+	private final Pose scorePose1 = new Pose(29.5, 71, Math.toRadians(180));
 	private final Pose scorePose2 = new Pose(29, 70, Math.toRadians(180));
-	private final Pose scorePose3 = new Pose(29, 68, Math.toRadians(180));
-	private final Pose scorePose4 = new Pose(29, 67.5, Math.toRadians(180));
+	private final Pose scorePose3 = new Pose(29, 69, Math.toRadians(180));
+	private final Pose scorePose4 = new Pose(29, 68, Math.toRadians(180));
 	private final Pose scorePose5 = new Pose(29, 67, Math.toRadians(180));
 	private final Pose scoreControl = new Pose(20, 70);
 
@@ -136,7 +136,7 @@ public class iHopeSpecsWorkLol extends OpMode {
 								new Point(65, 39.5, Point.CARTESIAN),
 								new Point(endPush2)
 						)
-				).setConstantHeadingInterpolation(Math.toRadians(180))
+				).setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(185))
 				// get to point before pushing 3
 				.addPath(
 						new BezierCurve(
@@ -171,6 +171,7 @@ public class iHopeSpecsWorkLol extends OpMode {
 						)
 				)
 				.setConstantHeadingInterpolation(Math.toRadians(180))
+				.setZeroPowerAccelerationMultiplier(0.2)
 				.build();
 		grab3 = follower.pathBuilder()
 				.addPath(
@@ -191,6 +192,7 @@ public class iHopeSpecsWorkLol extends OpMode {
 						)
 				)
 				.setConstantHeadingInterpolation(Math.toRadians(180))
+				.setZeroPowerAccelerationMultiplier(0.2)
 				.build();
 		grab4 = follower.pathBuilder()
 				.addPath(
@@ -211,6 +213,7 @@ public class iHopeSpecsWorkLol extends OpMode {
 						)
 				)
 				.setConstantHeadingInterpolation(Math.toRadians(180))
+				.setZeroPowerAccelerationMultiplier(0.2)
 				.build();
 		grab5 = follower.pathBuilder()
 				.addPath(
@@ -231,6 +234,7 @@ public class iHopeSpecsWorkLol extends OpMode {
 						)
 				)
 				.setConstantHeadingInterpolation(Math.toRadians(180))
+				.setZeroPowerAccelerationMultiplier(0.2)
 				.build();
 
 
