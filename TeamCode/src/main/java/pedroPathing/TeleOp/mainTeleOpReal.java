@@ -252,7 +252,7 @@ public class mainTeleOpReal extends LinearOpMode {
             if (gamepad2.a) {
                 specServo.setPosition(0.55);
                 sleep(400);
-                specDrive.setTargetPosition(480);
+                specDrive.setTargetPosition(470);
                 specDrive.setPower(1);
             }
             if (gamepad2.b) {

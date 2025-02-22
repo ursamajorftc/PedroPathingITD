@@ -58,9 +58,9 @@ public class iHopeSpecsWorkLol extends OpMode {
 
 	//grab specs
 	private final Pose grabPose2 = new Pose(9.8, 37, Math.toRadians(185));
-	private final Pose grabPose3 = new Pose(7.6, 36, Math.toRadians(180));
-	private final Pose grabPose4 = new Pose(7.6, 36, Math.toRadians(180));
-	private final Pose grabPose5 = new Pose(7.6, 36, Math.toRadians(180));
+	private final Pose grabPose3 = new Pose(7.2, 36, Math.toRadians(180));
+	private final Pose grabPose4 = new Pose(7.2, 36, Math.toRadians(180));
+	private final Pose grabPose5 = new Pose(7.2, 36, Math.toRadians(180));
 
 	//score specs
 	private final Pose scorePose1 = new Pose(29.5, 70.5, Math.toRadians(180));
@@ -285,7 +285,7 @@ public class iHopeSpecsWorkLol extends OpMode {
 				}
 //
 				if ((specServo.getPosition() == RConstants.SPECCLAWCLOSED) && (specDrive.getCurrentPosition() > 200)) {
-					follower.followPath(score2, true);
+					follower.followPath(score2, 0.9, true);
 					scoreTimer.resetTimer();
 					setPathState(3);
 					isSpecScore = false;
@@ -326,7 +326,7 @@ public class iHopeSpecsWorkLol extends OpMode {
 				}
 //
 				if ((specServo.getPosition() == RConstants.SPECCLAWCLOSED) && (specDrive.getCurrentPosition() > 200)) {
-					follower.followPath(score3,0.9, true);
+					follower.followPath(score3,0.82, true);
 					scoreTimer.resetTimer();
 					setPathState(8);
 					isSpecScore = false;
@@ -368,7 +368,7 @@ public class iHopeSpecsWorkLol extends OpMode {
 				}
 //
 				if ((specServo.getPosition() == RConstants.SPECCLAWCLOSED) && (specDrive.getCurrentPosition() > 200)) {
-					follower.followPath(score4, 0.9, true);
+					follower.followPath(score4, 0.82, true);
 					scoreTimer.resetTimer();
 					setPathState(10);
 					isSpecScore = false;
@@ -410,7 +410,7 @@ public class iHopeSpecsWorkLol extends OpMode {
 				}
 //
 				if ((specServo.getPosition() == RConstants.SPECCLAWCLOSED) && (specDrive.getCurrentPosition() > 200)) {
-					follower.followPath(score5, 0.9, true);
+					follower.followPath(score5, 0.82, true);
 					scoreTimer.resetTimer();
 					setPathState(12);
 					isSpecScore = false;
