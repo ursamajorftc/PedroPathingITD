@@ -165,8 +165,7 @@ public class mainTeleOpReal extends LinearOpMode {
 
 
         intakeDrive = hardwareMap.get(DcMotor.class, "intakeDrive");
-        intakeDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        intakeDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
         intakeDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         clawServo = hardwareMap.get(Servo.class, "clawServo");
@@ -186,9 +185,7 @@ public class mainTeleOpReal extends LinearOpMode {
         specDrive = hardwareMap.get(DcMotor.class, "specDrive");
         specServo = hardwareMap.get(Servo.class, "specServo");
 
-        specDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        specDrive.setTargetPosition(0);
-        specDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
 
 
         VoltageSensor voltageSensor = hardwareMap.voltageSensor.iterator().next();
@@ -200,10 +197,22 @@ public class mainTeleOpReal extends LinearOpMode {
 
         armServo.setPosition(0.475);
         wristServo.setPosition(wristPositionDown);
+
+        intakeDrive.setPower(-0.2);
+        specDrive.setPower(-0.15);
         //endregion
 
         // Wait for the game to start (driver presses START)
         waitForStart();
+
+        intakeDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+        intakeDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+//        specDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+        specDrive.setTargetPosition(0);
+        specDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
 //        IntakeController intakeController = new IntakeController(gamepad1, intakeDrive);
         runtime.reset();
@@ -243,7 +252,7 @@ public class mainTeleOpReal extends LinearOpMode {
             if (gamepad2.a) {
                 specServo.setPosition(0.55);
                 sleep(400);
-                specDrive.setTargetPosition(RConstants.SPECARMUP);
+                specDrive.setTargetPosition(480);
                 specDrive.setPower(1);
             }
             if (gamepad2.b) {
@@ -342,9 +351,9 @@ public class mainTeleOpReal extends LinearOpMode {
 
             double joystickInput = (gamepad1.left_stick_y)*-0.8;
             if (!intakeRetract) {
-                if (-20 < intakeDrive.getCurrentPosition() && intakeDrive.getCurrentPosition() <= 870) {
+                if (-20 < intakeDrive.getCurrentPosition() && intakeDrive.getCurrentPosition() <= 850) {
                     intakeDrive.setPower(joystickInput);
-                } else if (intakeDrive.getCurrentPosition() > 865) {
+                } else if (intakeDrive.getCurrentPosition() > 845) {
                     intakeDrive.setPower(-0.6);
                 } else {
                     intakeDrive.setPower(0.6);

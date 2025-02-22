@@ -53,8 +53,8 @@ public class iHopeSpecsWorkLol extends OpMode {
 	private final Pose startPush1 = new Pose(38, 47, Math.toRadians(180));
 	private final Pose endPush1 = new Pose(22, 42, Math.toRadians(180));
 	private final Pose endPush2 = new Pose(22, 32, Math.toRadians(180));
-	private final Pose startPush3 = new Pose(58, 32, Math.toRadians(180));
-	private final Pose endPush3 = new Pose(23.5, 28.5, Math.toRadians(180));
+	private final Pose startPush3 = new Pose(58, 32, Math.toRadians(185));
+	private final Pose endPush3 = new Pose(23.5, 28.5, Math.toRadians(185));
 
 	//grab specs
 	private final Pose grabPose2 = new Pose(9.8, 37, Math.toRadians(185));
@@ -145,7 +145,7 @@ public class iHopeSpecsWorkLol extends OpMode {
 								new Point(startPush3)
 						)
 				)
-				.setConstantHeadingInterpolation(Math.toRadians(180))
+				.setConstantHeadingInterpolation(Math.toRadians(185))
 				.setPathEndTValueConstraint(0.2)
 				//push 3
 				.addPath(
@@ -552,7 +552,7 @@ public class iHopeSpecsWorkLol extends OpMode {
 		specDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 		intakeDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-		specDrive.setTargetPosition(200);
+		specDrive.setTargetPosition(150);
 		specDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 		specDrive.setPower(0.5);
 		specServo.setPosition(RConstants.SPECCLAWCLOSED);
