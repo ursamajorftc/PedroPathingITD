@@ -58,9 +58,9 @@ public class iHopeSpecsWorkLol extends OpMode {
 	private final Pose endPush3 = new Pose(23.5, 28, Math.toRadians(185));
 
 	//grab specs
-	private final Pose grabPose2 = new Pose(9.8, 37, Math.toRadians(185));
-	private final Pose grabPose3 = new Pose(6.1, 36, Math.toRadians(180));
-	private final Pose grabPose4 = new Pose(6.1, 36, Math.toRadians(180));
+	private final Pose grabPose2 = new Pose(9.87, 37, Math.toRadians(185));
+	private final Pose grabPose3 = new Pose(6.2, 36, Math.toRadians(180));
+	private final Pose grabPose4 = new Pose(5.9, 36, Math.toRadians(180));
 	private final Pose grabPose5 = new Pose(5, 36, Math.toRadians(180));
 
 	//score specs
@@ -161,7 +161,7 @@ public class iHopeSpecsWorkLol extends OpMode {
 								new Point(grabPose2)
 						)
 				).setConstantHeadingInterpolation(Math.toRadians(185))
-
+				.setZeroPowerAccelerationMultiplier(0.2)
 				.build();
 		score2 = follower.pathBuilder()
 				.addPath(
@@ -497,7 +497,7 @@ public class iHopeSpecsWorkLol extends OpMode {
 					specTimeStart = System.currentTimeMillis();
 					break;
 				case 2:
-					if ((System.currentTimeMillis() - specTimeStart) > 600) {
+					if ((System.currentTimeMillis() - specTimeStart) > 900) {
 						specDrive.setTargetPosition(RConstants.SPECARMUP);
 						specDrive.setPower(1);
 						specState = 1;
