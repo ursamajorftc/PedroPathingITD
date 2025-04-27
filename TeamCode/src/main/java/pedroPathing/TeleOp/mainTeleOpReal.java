@@ -355,7 +355,7 @@ public class mainTeleOpReal extends LinearOpMode {
             }
 
             if (gamepad2.right_trigger < 0.1) {
-                follower.setTeleOpMovementVectors(-gamepad2.left_stick_y, -gamepad2.left_stick_x, (-gamepad2.right_stick_x * 0.65), true);
+                follower.setTeleOpMovementVectors(-gamepad2.left_stick_y, -gamepad2.left_stick_x, (-gamepad2.right_stick_x * 0.65), false);
                 follower.update();
                 telemetry.addData("it is pressed", false);
                 telemetry.update();
