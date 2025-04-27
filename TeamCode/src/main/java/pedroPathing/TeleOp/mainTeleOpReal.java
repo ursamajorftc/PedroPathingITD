@@ -446,7 +446,6 @@ public class mainTeleOpReal extends LinearOpMode {
     private RobotState currentState = RobotState.IDLE;
     private long stateStartTime = 0;
 
-
     public void updateArmRetract() {
         // Get the current time in milliseconds
         long currentTime = System.currentTimeMillis();
@@ -560,7 +559,7 @@ public class mainTeleOpReal extends LinearOpMode {
                     /* Grab Sample */
                     /* Since this is a pathChain, we can have Pedro hold the end point while we are scoring the sample */
                 }
-//
+
                 if ((specServo.getPosition() == RConstants.SPECCLAWCLOSED) && (specDrive.getCurrentPosition() > 290)) {
                     follower.followPath(score,0.9, true);
                     scoreTimer.resetTimer();
@@ -571,16 +570,12 @@ public class mainTeleOpReal extends LinearOpMode {
 
             case 2:
                 if ((rightTouchSensor.isPressed() && leftTouchSensor.isPressed()) && !isSpecScore) {
-//
                     /* Score Preload */
                     specScore = true;
                     isSpecScore = true;
                     follower.setPose(new Pose(28.5, follower.getPose().getY(), Math.toRadians(175)));
 
-
                     telemetry.addData("specScore", specScore);
-
-                    /* Since this is a pathChain, we can have Pedro hold the end point while we are grabbing the sample */
                 } else if ((rightTouchSensor.isPressed() ^ leftTouchSensor.isPressed()) && scoreTimer.getElapsedTimeSeconds() >= 2.5) {
                     specScore = true;
                     isSpecScore = true;
@@ -592,8 +587,6 @@ public class mainTeleOpReal extends LinearOpMode {
                     setPathState(1);
                     isSpecGrabbed = false;
                     scorePosition -= 0.5;
-
-
                 }
                 break;
         }
