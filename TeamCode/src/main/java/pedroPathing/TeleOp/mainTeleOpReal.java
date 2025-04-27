@@ -7,7 +7,6 @@ import android.view.View;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.localization.Pose;
 import com.pedropathing.pathgen.BezierCurve;
-import com.pedropathing.pathgen.PathBuilder;
 import com.pedropathing.pathgen.PathChain;
 import com.pedropathing.pathgen.Point;
 import com.pedropathing.util.Timer;
@@ -61,15 +60,14 @@ public class mainTeleOpReal extends LinearOpMode {
     private Servo clawServo;
     private Servo wristServo;
     private Servo armServo;
-    private DcMotor outmoto1;
-    private DcMotor outmoto2;
+    private DcMotor outMotor1;
+    private DcMotor outMotor2;
     NormalizedColorSensor colorSensor;
     NormalizedColorSensor sampleDistance;
     TouchSensor rightTouchSensor;
     TouchSensor leftTouchSensor;
     View relativeLayout;
     PIDController verticalSlidePid = new PIDController(0.01, 0, 0);
-    PIDController intakeSlidePid = new PIDController(0.01, 0, 0);
     //endregion
 
     //region Variables
@@ -93,8 +91,7 @@ public class mainTeleOpReal extends LinearOpMode {
     int downPosition = 0;
 
     //state machines
-    private boolean previousDpadDownState = false;
-    private boolean previousBumberState = false;
+    private boolean previousBumperState = false;
     private boolean previousDpadUpState = false;
     private boolean PreviousDpadLeftState = false;
     private boolean previousAState = false;
@@ -152,15 +149,15 @@ public class mainTeleOpReal extends LinearOpMode {
         wristServo = hardwareMap.get(Servo.class, "wristServo");
         armServo = hardwareMap.get(Servo.class, "armServo");
 
-        outmoto1 = hardwareMap.get(DcMotorEx.class, "outmoto1");
-        outmoto2 = hardwareMap.get(DcMotorEx.class, "outmoto2");
+        outMotor1 = hardwareMap.get(DcMotorEx.class, "outMotor1");
+        outMotor2 = hardwareMap.get(DcMotorEx.class, "outMotor2");
 
-        outmoto1.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
-        outmoto2.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
-        outmoto1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        outMotor1.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+        outMotor2.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+        outMotor1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-        outmoto1.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
-        outmoto2.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
+        outMotor1.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
+        outMotor2.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
 
         specDrive = hardwareMap.get(DcMotor.class, "specDrive");
         specServo = hardwareMap.get(Servo.class, "specServo");
@@ -190,12 +187,10 @@ public class mainTeleOpReal extends LinearOpMode {
         specDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         intakeDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-//        specDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         specDrive.setTargetPosition(0);
         specDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
-//        IntakeController intakeController = new IntakeController(gamepad1, intakeDrive);
         runtime.reset();
 
         armServo.setPosition(0.475);
@@ -206,7 +201,6 @@ public class mainTeleOpReal extends LinearOpMode {
         opmodeTimer = new Timer();
         opmodeTimer.resetTimer();
         scoreTimer = new Timer();
-        intakeTimer = new Timer();
 
 
 
@@ -251,8 +245,8 @@ public class mainTeleOpReal extends LinearOpMode {
 
             if (gamepad1.y){
                 intakeRetract = true;
-                if (intakeRetract) intakeDrive.setPower(-0.6);
-            } else intakeRetract = false;
+                if (intakeRetract) {intakeDrive.setPower(-0.6);}
+            } else {intakeRetract = false;}
             if (gamepad1.b) {
                 intakeCRSLeft.setPower(0);
                 intakeCRSRight.setPower(0);
@@ -284,7 +278,7 @@ public class mainTeleOpReal extends LinearOpMode {
             }
 
             updateArmTransfer();
-            updateArmRetracty();
+            updateArmRetract();
 //            peckArm();
 
 
@@ -298,37 +292,36 @@ public class mainTeleOpReal extends LinearOpMode {
             }
 
             //intakeServoRight.setPosition(intakeServoPosition);
-            previousDpadDownState = gamepad1.dpad_down;
             previousDpadUpState = gamepad1.dpad_up;
             PreviousDpadLeftState = gamepad1.dpad_left;
 
 
-            if ((intakeDrive.getCurrentPosition() > 145) && outmoto1.getCurrentPosition() < 100) {
+            if ((intakeDrive.getCurrentPosition() > 145) && outMotor1.getCurrentPosition() < 100) {
                 previousIntakeState = true;
-                if (outmoto1.getCurrentPosition() < 15) {
+                if (outMotor1.getCurrentPosition() < 15) {
                     armServo.setPosition(armPositionHover);
                     clawServo.setPosition(clawPositionOpen);
                 }
             }
 
-            double power = verticalSlidePid.getPower(outmoto1.getCurrentPosition());
-            if (outmoto1.getCurrentPosition() > verticalSlidePid.getTargetPosition() + 20) {
-                outmoto1.setPower(-0.4);
-                outmoto2.setPower(0.4);
-            } else if (outmoto1.getCurrentPosition() < verticalSlidePid.getTargetPosition()+20 && outmoto1.getCurrentPosition() >= verticalSlidePid.getTargetPosition()){
-                outmoto1.setPower(0);
-                outmoto2.setPower(0);
+            double power = verticalSlidePid.getPower(outMotor1.getCurrentPosition());
+            if (outMotor1.getCurrentPosition() > verticalSlidePid.getTargetPosition() + 20) {
+                outMotor1.setPower(-0.4);
+                outMotor2.setPower(0.4);
+            } else if (outMotor1.getCurrentPosition() < verticalSlidePid.getTargetPosition()+20 && outMotor1.getCurrentPosition() >= verticalSlidePid.getTargetPosition()){
+                outMotor1.setPower(0);
+                outMotor2.setPower(0);
             } else {
-                outmoto1.setPower(power);
-                outmoto2.setPower(-power);
+                outMotor1.setPower(power);
+                outMotor2.setPower(-power);
             }
 
-            if (gamepad2.left_bumper && !previousBumberState) {
+            if (gamepad2.left_bumper && !previousBumperState) {
                 lockServo.setPosition(0);
                 specMode = !specMode;
             }
 
-            previousBumberState = gamepad2.left_bumper;
+            previousBumperState = gamepad2.left_bumper;
 
             double joystickInput = (gamepad1.left_stick_y)*-0.8;
             if (!intakeRetract) {
@@ -382,7 +375,7 @@ public class mainTeleOpReal extends LinearOpMode {
             packet.put("IntakeServoPosition", intakeServoPosition);
             packet.put("IntakePosition", intakeDrive.getCurrentPosition());
             packet.put("HSV Value", color);
-            packet.put("Deposit Slides", outmoto1.getCurrentPosition());
+            packet.put("Deposit Slides", outMotor1.getCurrentPosition());
             double batteryVoltage = voltageSensor.getVoltage();
             packet.put("Battery Voltage", batteryVoltage);
             packet.put("Target Position", highBasket);
@@ -393,7 +386,7 @@ public class mainTeleOpReal extends LinearOpMode {
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.addData("IntakePosition", intakeDrive.getCurrentPosition());
             telemetry.addData("hsv Value:", color);
-            telemetry.addData("Deposit Slides", outmoto1.getCurrentPosition());
+            telemetry.addData("Deposit Slides", outMotor1.getCurrentPosition());
             telemetry.addData("Deposit Target Position", verticalSlidePid.getTargetPosition());
             telemetry.addData("specDrive position", specDrive.getCurrentPosition());
             telemetry.addData("spec Mode", specMode);
@@ -403,11 +396,7 @@ public class mainTeleOpReal extends LinearOpMode {
 
     }
 
-    int peckState = 0;
-    long peckTime = 0;
-
     public boolean specScore = false;
-    public boolean specPickUp = false;
 
 
 
@@ -428,62 +417,6 @@ public class mainTeleOpReal extends LinearOpMode {
 
 
     public boolean specGrabbed = false;
-    public int specState = 1;
-    public long specTimeStart = 0;
-    public void SpecGrab() {
-        if (!specGrabbed) {
-            switch (specState) {
-                case 1:
-                    specServo.setPosition(RConstants.SPECCLAWCLOSED);
-                    specState = 2;
-                    specTimeStart = System.currentTimeMillis();
-                    break;
-                case 2:
-                    if ((System.currentTimeMillis() - specTimeStart) > 600) {
-                        specDrive.setTargetPosition(RConstants.SPECARMUP);
-                        specDrive.setPower(1);
-                        specState = 1;
-                        specGrabbed = true;
-                    }
-            }
-        }
-
-
-    }
-
-    public static PathBuilder builder = new PathBuilder();
-
-
-//    public void peckArm() {
-//        if (gamepad2.right_bumper) {
-//            peckState = 1;
-//            peckTime = System.currentTimeMillis();
-//        }
-//
-//        switch (peckState) {
-//            case 1:
-//                armServo.setPosition(armPositionGrab);
-//                wristServo.setPosition(wristPositionDown);
-//                peckState = 2;
-//                break;
-//
-//            case 2:
-//                if (System.currentTimeMillis() - peckTime > 100) {
-//                    clawServo.setPosition(RConstants.CLAWPOSITIONCLOSED);
-//                    peckTime = System.currentTimeMillis();
-//                    peckState = 2;
-//                }
-//
-//            case 3:
-//                if (System.currentTimeMillis() - peckTime > 250) {
-//                    armServo.setPosition(armPositionHover);
-//                    wristServo.setPosition(wristPositionDown);
-//                    clawServo.setPosition(RConstants.CLAWPOSITIONOPEN);
-//
-//                    peckState = 0;
-//                }
-//        }
-//    }
 
     public void updateArmTransfer() {
         if ((!sampleDistanceTriggered && ((DistanceSensor) sampleDistance).getDistance(DistanceUnit.MM) < 12)) {
@@ -548,7 +481,7 @@ public class mainTeleOpReal extends LinearOpMode {
     private long stateStartTime = 0;
 
 
-    public void updateArmRetracty() {
+    public void updateArmRetract() {
         // Get the current time in milliseconds
         long currentTime = System.currentTimeMillis();
 
@@ -589,9 +522,9 @@ public class mainTeleOpReal extends LinearOpMode {
             case OPEN_CLAW:
                 if (currentTime - stateStartTime >= 200) { // Wait 200ms
                     verticalSlidePid.setTargetPosition(downPosition);
-                    if (outmoto1.getCurrentPosition() >= 20) {
-                        outmoto1.setPower(-0.2);
-                        outmoto2.setPower(0.2);
+                    if (outMotor1.getCurrentPosition() >= 20) {
+                        outMotor1.setPower(-0.2);
+                        outMotor2.setPower(0.2);
                     }
                     telemetry.addData("yippee", gamepad1.a);
                     stateStartTime = currentTime;
@@ -609,7 +542,7 @@ public class mainTeleOpReal extends LinearOpMode {
     }
 
     private int pathState;
-    private Timer pathTimer, opmodeTimer, scoreTimer, intakeTimer;
+    private Timer pathTimer, opmodeTimer, scoreTimer;
 
 
     private final Pose grabPose = new Pose(7.7, 36, Math.toRadians(180));
