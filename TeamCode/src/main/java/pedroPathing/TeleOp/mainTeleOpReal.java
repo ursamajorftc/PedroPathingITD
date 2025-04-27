@@ -42,7 +42,7 @@ import pedroPathing.pid.PIDController;
 
 @Config
 
-@TeleOp(name = "mainTeleOp", group = "Linear OpMode")
+@TeleOp(name = "Main TeleOp", group = "Linear OpMode")
 
 public class mainTeleOpReal extends LinearOpMode {
     // region Initializations
@@ -107,9 +107,7 @@ public class mainTeleOpReal extends LinearOpMode {
     private double scorePosition = 65;
     private boolean intakeRetract = false;
     private boolean specMode = false;
-    int intakeTargetPosition = 0;
     //endregion
-
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -124,22 +122,17 @@ public class mainTeleOpReal extends LinearOpMode {
         telemetry.update();
         buildPaths();
 
-
         int relativeLayoutId = hardwareMap.appContext.getResources().getIdentifier("RelativeLayout", "id", hardwareMap.appContext.getPackageName());
         relativeLayout = ((Activity) hardwareMap.appContext).findViewById(relativeLayoutId);
 
         List<LynxModule> allHubs = hardwareMap.getAll(LynxModule.class);
-
-        for (LynxModule hub : allHubs){
-            hub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
-        }
+        for (LynxModule hub : allHubs) hub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
 
         intakeCRSLeft = hardwareMap.get(CRServo.class, "intakeCRSLeft");
         intakeCRSRight = hardwareMap.get(CRServo.class, "intakeCRSRight");
         intakeServoLeft = hardwareMap.get(Servo.class, "intakeServoLeft");
         intakeServoRight = hardwareMap.get(Servo.class, "intakeServoRight");
         lockServo = hardwareMap.get(Servo.class, "lockServo");
-
 
         intakeDrive = hardwareMap.get(DcMotor.class, "intakeDrive");
 
@@ -161,9 +154,6 @@ public class mainTeleOpReal extends LinearOpMode {
 
         specDrive = hardwareMap.get(DcMotor.class, "specDrive");
         specServo = hardwareMap.get(Servo.class, "specServo");
-
-
-
 
         VoltageSensor voltageSensor = hardwareMap.voltageSensor.iterator().next();
         colorSensor = hardwareMap.get(NormalizedColorSensor.class, "intakeSensor");
@@ -203,26 +193,14 @@ public class mainTeleOpReal extends LinearOpMode {
         scoreTimer = new Timer();
 
 
-
-
-        // run until the end of the match (driver presses STOP)
-
         while (opModeIsActive()) {
             resetCache(allHubs);
 
             NormalizedRGBA colors = colorSensor.getNormalizedColors();
-            NormalizedRGBA colors1 = sampleDistance.getNormalizedColors();
-
-//            intakeController.run();
 
             // Update the hsvValues array by passing it to Color.colorToHSV()
             Color.colorToHSV(colors.toColor(), hsvValues);
             double color = hsvValues[0];
-
-
-            // Setup a variable for each drive wheel to save power level for telemetry
-            
-
 
             if (gamepad2.a) {
                 specServo.setPosition(0.55);
@@ -238,7 +216,7 @@ public class mainTeleOpReal extends LinearOpMode {
             if (gamepad1.x) {
                 intakeCRSLeft.setPower(1);
                 intakeCRSRight.setPower(-1);
-            }else {
+            } else {
                 intakeCRSLeft.setPower(-1);
                 intakeCRSRight.setPower(1);
             }
@@ -246,7 +224,10 @@ public class mainTeleOpReal extends LinearOpMode {
             if (gamepad1.y){
                 intakeRetract = true;
                 if (intakeRetract) {intakeDrive.setPower(-0.6);}
-            } else {intakeRetract = false;}
+            } else {
+                intakeRetract = false;
+            }
+
             if (gamepad1.b) {
                 intakeCRSLeft.setPower(0);
                 intakeCRSRight.setPower(0);
@@ -279,8 +260,6 @@ public class mainTeleOpReal extends LinearOpMode {
 
             updateArmTransfer();
             updateArmRetract();
-//            peckArm();
-
 
             if (gamepad1.a) {
                 wristServo.setPosition(wristPositionOut);
@@ -349,9 +328,6 @@ public class mainTeleOpReal extends LinearOpMode {
                 specScoreUpdate();
                 telemetry.addData("it is pressed", true);
                 telemetry.update();
-
-
-
             }
 
             if (gamepad2.right_trigger < 0.1) {
@@ -382,25 +358,18 @@ public class mainTeleOpReal extends LinearOpMode {
             dashboard.sendTelemetryPacket(packet);
 
             telemetry.addData("Battery Voltage", batteryVoltage);
-            telemetry.update();
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.addData("IntakePosition", intakeDrive.getCurrentPosition());
-            telemetry.addData("hsv Value:", color);
+            telemetry.addData("HSV Value:", color);
             telemetry.addData("Deposit Slides", outMotor1.getCurrentPosition());
             telemetry.addData("Deposit Target Position", verticalSlidePid.getTargetPosition());
             telemetry.addData("specDrive position", specDrive.getCurrentPosition());
-            telemetry.addData("spec Mode", specMode);
+            telemetry.addData("Spec Mode", specMode);
             telemetry.update();
             //endregion
         }
-
     }
-
     public boolean specScore = false;
-
-
-
-
 
     public void SpecScore() {
         if (specScore) {
@@ -413,9 +382,6 @@ public class mainTeleOpReal extends LinearOpMode {
             specScore = false;
         }
     }
-
-
-
     public boolean specGrabbed = false;
 
     public void updateArmTransfer() {
