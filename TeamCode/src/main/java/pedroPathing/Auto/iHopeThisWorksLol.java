@@ -194,15 +194,7 @@ public class iHopeThisWorksLol extends OpMode {
 
         buildPaths();
 
-//		intakeDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-//		intakeDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-//		intakeDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-//
-//		outmoto1.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
-//		outmoto2.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
-//
-//		outmoto1.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
-//		outmoto2.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
+
     }
 
     public void buildPaths() {
@@ -876,120 +868,6 @@ public class iHopeThisWorksLol extends OpMode {
     }
 
 
-    //region Intake Methods
-//	public void setIntakePos(int distance) {
-//		intakeDrive.setTargetPosition(distance);
-//		intakeDrive.setPower(1);
-//	}
-//
-//	public double getIntakePos() {
-//		return intakeDrive.getCurrentPosition();
-//	}
-//
-//	public void intakeDown() {
-//		intakeServoLeft.setPosition(RConstants.LEFTINTAKEDOWN);
-//		intakeServoRight.setPosition(RConstants.RIGHTINTAKEDOWN);
-//	}
-//
-//	public void intakeUp() {
-//		intakeServoLeft.setPosition(RConstants.LEFTINTAKEUP);
-//		intakeServoRight.setPosition(RConstants.RIGHTINTAKEUP);
-//	}
-//	public void spinIntake(){
-//		intakeCRSLeft.setPower(-1);
-//		intakeCRSRight.setPower(1);
-//	}
-//	public void spinIntake(double power){
-//		intakeCRSLeft.setPower(-power);
-//		intakeCRSRight.setPower(power);
-//	}
-//
-//	public void openLock() {
-//		lockServo.setPosition(0);
-//	}
-//
-//	public void closeLock() {
-//		lockServo.setPosition(0.3);
-//	}
-    public enum IntakeState {
-        INTAKESTART,
-        INTAKEOUT,
-        INTAKEDOWN,
-        INTAKEUP
-    }
-
-
-    //	public void grabSample(int distance) {
-//		switch (intakeState){
-//			case INTAKESTART:
-//				setIntakePos(distance);
-//				intakeState = IntakeState.INTAKEOUT;
-//
-//			case INTAKEOUT:
-//				if (intakeDrive.getCurrentPosition() > 250) {
-//					intakeDown();
-//					spinIntake();
-//					closeLock();
-//					opmodeTimer.resetTimer();
-//					intakeState = IntakeState.INTAKEDOWN;
-//				}
-//				break;
-//			case INTAKEDOWN:
-//				if (opmodeTimer.getElapsedTimeSeconds() > 2) {
-//					intakeUp();
-//					spinIntake(0.2);
-//					opmodeTimer.resetTimer();
-//					intakeState = IntakeState.INTAKEUP;
-//				}
-//				break;
-//			case INTAKEUP:
-//				if (opmodeTimer.getElapsedTimeSeconds() > 0.5) {
-//					setIntakePos(0);
-//					openLock();
-//					intakeState = IntakeState.INTAKESTART;
-//				}
-//				break;
-//		}
-//	}
-    //endregion
-    //region Deposit Methods
-//	public void closeClaw() {
-//		clawServo.setPosition(RConstants.CLAWPOSITIONCLOSED);
-//	}
-//
-//	public void openClaw() {
-//		clawServo.setPosition(RConstants.CLAWPOSITIONOPEN);
-//	}
-//
-//	public void wristDown() {
-//		wristServo.setPosition(RConstants.WRISTPOSITIONDOWN);
-//	}
-//
-//	public void wristBack() {
-//		wristServo.setPosition(RConstants.WRISTPOSITIONOUT);
-//	}
-//
-//	public void armDeposit() {
-//		armServo.setPosition(RConstants.ARMPOSITIONDEPOSIT);
-//	}
-//
-//	public void armHover() {
-//		armServo.setPosition(RConstants.ARMPOSITIONHOVER);
-//	}
-//
-//	public void armGrab() {
-//		armServo.setPosition(RConstants.ARMPOSITIONGRAB);
-//	}
-    enum DepositState {
-        IDLE,
-        CLOSE_CLAW,
-        MOVE_ARM,
-        MOVE_WRIST,
-        RESET,
-        COMPLETE
-    }
-
-    //endregion
 
     // This method is called continuously after Init while waiting for "play".
     @Override
