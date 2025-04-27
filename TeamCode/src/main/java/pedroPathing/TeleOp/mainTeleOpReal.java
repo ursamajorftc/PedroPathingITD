@@ -21,6 +21,7 @@ import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.pedropathing.util.Constants;
 
+import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
@@ -35,6 +36,8 @@ import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+
+import java.util.List;
 
 import pedroPathing.pid.PIDController;
 
@@ -128,6 +131,12 @@ public class mainTeleOpReal extends LinearOpMode {
         int relativeLayoutId = hardwareMap.appContext.getResources().getIdentifier("RelativeLayout", "id", hardwareMap.appContext.getPackageName());
         relativeLayout = ((Activity) hardwareMap.appContext).findViewById(relativeLayoutId);
 
+        List<LynxModule> allHubs = hardwareMap.getAll(LynxModule.class);
+
+        for (LynxModule hub : allHubs){
+            hub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
+        }
+
         intakeCRSLeft = hardwareMap.get(CRServo.class, "intakeCRSLeft");
         intakeCRSRight = hardwareMap.get(CRServo.class, "intakeCRSRight");
         intakeServoLeft = hardwareMap.get(Servo.class, "intakeServoLeft");
@@ -205,7 +214,7 @@ public class mainTeleOpReal extends LinearOpMode {
         // run until the end of the match (driver presses STOP)
 
         while (opModeIsActive()) {
-
+            resetCache(allHubs);
 
             NormalizedRGBA colors = colorSensor.getNormalizedColors();
             NormalizedRGBA colors1 = sampleDistance.getNormalizedColors();
@@ -690,5 +699,9 @@ public class mainTeleOpReal extends LinearOpMode {
                 break;
         }
     }
-
+    public void resetCache(List<LynxModule> allHubs){
+        for (LynxModule hub : allHubs) {
+            hub.clearBulkCache();
+        }
+    }
 }
