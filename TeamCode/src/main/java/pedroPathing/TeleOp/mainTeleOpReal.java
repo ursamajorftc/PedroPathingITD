@@ -34,6 +34,8 @@ import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+//import com.arcrobotics.ftclib.hardware.motors.MotorGroup;
+
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 import java.util.List;
@@ -41,7 +43,6 @@ import java.util.List;
 import pedroPathing.pid.PIDController;
 
 @Config
-
 @TeleOp(name = "Main TeleOp", group = "Linear OpMode")
 
 public class mainTeleOpReal extends LinearOpMode {
@@ -151,6 +152,8 @@ public class mainTeleOpReal extends LinearOpMode {
 
         outMotor1.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
         outMotor2.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
+
+        MotorGroup backSlides = new MotorGroup(outMotor1, outMotor2);
 
         specDrive = hardwareMap.get(DcMotor.class, "specDrive");
         specServo = hardwareMap.get(Servo.class, "specServo");
