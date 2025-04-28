@@ -26,6 +26,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
 import com.qualcomm.robotcore.hardware.NormalizedRGBA;
@@ -33,8 +34,6 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
-
-import com.arcrobotics.ftclib.hardware.motors.MotorGroup;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
@@ -152,8 +151,8 @@ public class mainTeleOpReal extends LinearOpMode {
 
         outMotor1.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
         outMotor2.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
+        outMotor2.setDirection(DcMotorSimple.Direction.REVERSE);
 
-        MotorGroup backSlides = new MotorGroup(outMotor1, outMotor2);
 
         specDrive = hardwareMap.get(DcMotor.class, "specDrive");
         specServo = hardwareMap.get(Servo.class, "specServo");
@@ -289,13 +288,13 @@ public class mainTeleOpReal extends LinearOpMode {
             double power = verticalSlidePid.getPower(outMotor1.getCurrentPosition());
             if (outMotor1.getCurrentPosition() > verticalSlidePid.getTargetPosition() + 20) {
                 outMotor1.setPower(-0.4);
-                outMotor2.setPower(0.4);
+                outMotor2.setPower(-0.4);
             } else if (outMotor1.getCurrentPosition() < verticalSlidePid.getTargetPosition()+20 && outMotor1.getCurrentPosition() >= verticalSlidePid.getTargetPosition()){
                 outMotor1.setPower(0);
                 outMotor2.setPower(0);
             } else {
                 outMotor1.setPower(power);
-                outMotor2.setPower(-power);
+                outMotor2.setPower(power);
             }
 
             if (gamepad2.left_bumper && !previousBumperState) {
@@ -329,14 +328,12 @@ public class mainTeleOpReal extends LinearOpMode {
             while (gamepad2.right_trigger > 0.1) {
                 //follow path
                 specScoreUpdate();
-                telemetry.addData("it is pressed", true);
                 telemetry.update();
             }
 
             if (gamepad2.right_trigger < 0.1) {
                 follower.setTeleOpMovementVectors(-gamepad2.left_stick_y, -gamepad2.left_stick_x, (-gamepad2.right_stick_x * 0.65), false);
                 follower.update();
-                telemetry.addData("it is pressed", false);
                 telemetry.update();
 
             }
@@ -466,7 +463,6 @@ public class mainTeleOpReal extends LinearOpMode {
             case CLOSE_CLAW:
                 if (currentTime - stateStartTime >= 200) { // Wait 200ms
                     armServo.setPosition(0.475);
-
                     currentState = RobotState.MOVE_ARM;
                 }
                 break;
@@ -492,7 +488,7 @@ public class mainTeleOpReal extends LinearOpMode {
                     verticalSlidePid.setTargetPosition(downPosition);
                     if (outMotor1.getCurrentPosition() >= 20) {
                         outMotor1.setPower(-0.2);
-                        outMotor2.setPower(0.2);
+                        outMotor2.setPower(-0.2);
                     }
                     telemetry.addData("yippee", gamepad1.a);
                     stateStartTime = currentTime;
