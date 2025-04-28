@@ -48,7 +48,6 @@ public class mainTeleOpReal extends LinearOpMode {
     // region Initializations
     private Follower follower;
     private FtcDashboard dashboard;
-    private ElapsedTime runtime = new ElapsedTime();
     private CRServo intakeCRSLeft;
     private CRServo intakeCRSRight;
     private Servo intakeServoLeft;
@@ -99,10 +98,7 @@ public class mainTeleOpReal extends LinearOpMode {
     boolean sampleDistanceTriggered = false;
     int state = 0; // Persistent state variable
     long startTime = 0; // Persistent timer variable
-
     final float[] hsvValues = new float[3];
-    public double intakeServoPosition = 0;
-
     private final Pose robotPose = new Pose(29, 67, Math.toRadians(180));
     private double scorePosition = 65;
     private boolean intakeRetract = false;
@@ -183,8 +179,6 @@ public class mainTeleOpReal extends LinearOpMode {
         specDrive.setTargetPosition(0);
         specDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
-        runtime.reset();
-
         armServo.setPosition(0.475);
         wristServo.setPosition(wristPositionDown);
 
@@ -193,7 +187,6 @@ public class mainTeleOpReal extends LinearOpMode {
         opmodeTimer = new Timer();
         opmodeTimer.resetTimer();
         scoreTimer = new Timer();
-
 
         while (opModeIsActive()) {
             resetCache(allHubs);
@@ -337,36 +330,6 @@ public class mainTeleOpReal extends LinearOpMode {
                 telemetry.update();
 
             }
-
-            if (specMode) {
-                telemetry.addLine("<font color='blue'>Special Mode Active</font>");
-            } else {
-                telemetry.addLine("<font color='white'>Normal Mode</font>");
-            }
-
-            //region Telemetry
-            TelemetryPacket packet = new TelemetryPacket();
-
-            packet.put("Status", "Run Time: " + runtime.toString());
-            packet.put("IntakeServoPosition", intakeServoPosition);
-            packet.put("IntakePosition", intakeDrive.getCurrentPosition());
-            packet.put("HSV Value", color);
-            packet.put("Deposit Slides", outMotor1.getCurrentPosition());
-            double batteryVoltage = voltageSensor.getVoltage();
-            packet.put("Battery Voltage", batteryVoltage);
-            packet.put("Target Position", highBasket);
-            dashboard.sendTelemetryPacket(packet);
-
-            telemetry.addData("Battery Voltage", batteryVoltage);
-            telemetry.addData("Status", "Run Time: " + runtime.toString());
-            telemetry.addData("IntakePosition", intakeDrive.getCurrentPosition());
-            telemetry.addData("HSV Value:", color);
-            telemetry.addData("Deposit Slides", outMotor1.getCurrentPosition());
-            telemetry.addData("Deposit Target Position", verticalSlidePid.getTargetPosition());
-            telemetry.addData("specDrive position", specDrive.getCurrentPosition());
-            telemetry.addData("Spec Mode", specMode);
-            telemetry.update();
-            //endregion
         }
     }
     public boolean specScore = false;
@@ -426,8 +389,6 @@ public class mainTeleOpReal extends LinearOpMode {
                         wristServo.setPosition(wristPositionStraight);
                         state = 0;
                         sampleDistanceTriggered = false;
-
-                        // End the state machine
                     }
                     break;
             }
